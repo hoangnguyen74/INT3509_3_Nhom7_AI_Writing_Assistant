@@ -3,7 +3,7 @@ import { PenLine, Sparkles, X, Eye, EyeOff, Key } from 'lucide-react';
 import Editor from './components/Editor/Editor';
 import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
-import { checkGeminiStatus, getApiKey, setApiKey } from './services/gemini';
+import { checkGroqStatus, getApiKey, setApiKey } from './services/groq';
 import './App.css';
 
 function SettingsModal({ isOpen, onClose, onSave }) {
@@ -25,7 +25,7 @@ function SettingsModal({ isOpen, onClose, onSave }) {
     // Temporarily save key to test
     const oldKey = getApiKey();
     setApiKey(key);
-    const status = await checkGeminiStatus();
+    const status = await checkGroqStatus();
     if (!status.running) {
       setApiKey(oldKey); // restore old key on failure
     }
@@ -51,12 +51,12 @@ function SettingsModal({ isOpen, onClose, onSave }) {
         <div className="settings-modal__body">
           <label className="settings-label">
             <Key size={14} />
-            Gemini API Key
+            Groq API Key
           </label>
           <p className="settings-hint">
             Get a free API key from{' '}
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">
-              Google AI Studio →
+            <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
+              Groq Console →
             </a>
           </p>
           <div className="settings-input-group">
@@ -65,7 +65,7 @@ function SettingsModal({ isOpen, onClose, onSave }) {
               className="settings-input"
               value={key}
               onChange={e => setKey(e.target.value)}
-              placeholder="AIzaSy..."
+              placeholder="gsk_..."
             />
             <button
               className="settings-input-toggle"
@@ -78,7 +78,7 @@ function SettingsModal({ isOpen, onClose, onSave }) {
 
           {testResult && (
             <div className={`settings-test-result ${testResult.running ? 'success' : 'error'}`}>
-              {testResult.running ? '✅ API key is valid! Connected to Gemini.' : `❌ ${testResult.error}`}
+              {testResult.running ? '✅ API key is valid! Connected to Groq.' : `❌ ${testResult.error}`}
             </div>
           )}
 
@@ -105,17 +105,17 @@ function SettingsModal({ isOpen, onClose, onSave }) {
 }
 
 export default function App() {
-  const [geminiStatus, setGeminiStatus] = useState({ running: false });
+  const [groqStatus, setGroqStatus] = useState({ running: false });
   const [showSettings, setShowSettings] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const editorRef = useRef(null);
 
   const checkStatus = useCallback(async () => {
-    const status = await checkGeminiStatus();
-    setGeminiStatus(status);
+    const status = await checkGroqStatus();
+    setGroqStatus(status);
   }, []);
 
-  // Check Gemini status on mount
+  // Check Groq status on mount
   useEffect(() => {
     checkStatus();
   }, [checkStatus]);
@@ -162,7 +162,7 @@ export default function App() {
 
         <AIPanel
           editor={editorRef.current}
-          geminiStatus={geminiStatus}
+          groqStatus={groqStatus}
           onOpenSettings={() => setShowSettings(true)}
         />
 

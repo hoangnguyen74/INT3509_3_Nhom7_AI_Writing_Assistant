@@ -1,93 +1,82 @@
 // ========================================
-// Google Gemini API Service — WriteAI
+// Groq Cloud API Service — WriteAI
 // ========================================
 
-const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1/models';
-const DEFAULT_MODEL = 'gemini-1.5-flash';
+const GROQ_API_BASE = 'https://api.groq.com/openai/v1/chat/completions';
+const DEFAULT_MODEL = 'llama3-8b-8192';
 
 /**
  * Get API key from localStorage
  */
 export function getApiKey() {
-  return localStorage.getItem('writeai-gemini-key') || '';
+  return localStorage.getItem('writeai-groq-key') || '';
 }
 
 /**
  * Save API key to localStorage
  */
 export function setApiKey(key) {
-  localStorage.setItem('writeai-gemini-key', key);
+  localStorage.setItem('writeai-groq-key', key);
 }
 
 /**
  * Check if API key is configured and valid
  */
-export async function checkGeminiStatus() {
+export async function checkGroqStatus() {
   const apiKey = getApiKey();
   if (!apiKey) {
     return { running: false, error: 'No API key configured' };
   }
   try {
-    const res = await fetch(
-      `${GEMINI_API_BASE}/${DEFAULT_MODEL}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: 'Hi' }] }],
-          generationConfig: { maxOutputTokens: 5 },
-        }),
-      }
-    );
+    const res = await fetch(GROQ_API_BASE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        messages: [{ role: 'user', content: 'Hi' }],
+        max_tokens: 5,
+      }),
+    });
     if (res.ok) {
       return { running: true, model: DEFAULT_MODEL };
     }
     const err = await res.json();
-    let errorMsg = err.error?.message || 'Invalid API key';
-    if (errorMsg.includes('Quota exceeded') || res.status === 429) {
-      errorMsg = 'API Quota Exceeded. Please check your Google AI Studio billing/plan.';
-    }
-    return { running: false, error: errorMsg };
+    return { running: false, error: err.error?.message || 'Invalid API key' };
   } catch {
     return { running: false, error: 'Network error or CORS issue' };
   }
 }
 
 /**
- * Call Gemini API with streaming
+ * Call Groq API with streaming
  */
-async function geminiGenerate(prompt, onChunk, model = DEFAULT_MODEL) {
+async function groqGenerate(prompt, onChunk, model = DEFAULT_MODEL) {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error('Please set your Gemini API key in Settings.');
+    throw new Error('Please set your Groq API key in Settings.');
   }
 
-  const response = await fetch(
-    `${GEMINI_API_BASE}/${model}:streamGenerateContent?alt=sse&key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 4096,
-        },
-      }),
-    }
-  );
+  const response = await fetch(GROQ_API_BASE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 4096,
+      stream: true,
+    }),
+  });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     let errMsg = err.error?.message || `API Error: ${response.status}`;
-    if (response.status === 429 || errMsg.includes('Quota exceeded')) {
-      throw new Error('API Quota Exceeded. Please check your Google AI Studio billing/plan.');
-    }
     throw new Error(errMsg);
   }
 
@@ -105,10 +94,10 @@ async function geminiGenerate(prompt, onChunk, model = DEFAULT_MODEL) {
     for (const line of lines) {
       if (line.startsWith('data: ')) {
         const jsonStr = line.slice(6);
-        if (jsonStr === '[DONE]') continue;
+        if (jsonStr.trim() === '[DONE]') continue;
         try {
           const json = JSON.parse(jsonStr);
-          const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+          const text = json.choices?.[0]?.delta?.content;
           if (text) {
             fullResponse += text;
             onChunk?.(fullResponse);
@@ -136,7 +125,7 @@ ${text}
 
 Provide a clear, well-structured summary:`;
 
-  return geminiGenerate(prompt, onChunk);
+  return groqGenerate(prompt, onChunk);
 }
 
 /**
@@ -162,7 +151,7 @@ ${text}
 
 Analysis:`;
 
-  return geminiGenerate(prompt, onChunk);
+  return groqGenerate(prompt, onChunk);
 }
 
 /**
@@ -186,5 +175,5 @@ ${text}
 
 Rewritten text in ${tone} tone:`;
 
-  return geminiGenerate(prompt, onChunk);
+  return groqGenerate(prompt, onChunk);
 }

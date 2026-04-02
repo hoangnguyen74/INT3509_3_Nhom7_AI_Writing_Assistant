@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Sparkles, FileText, SpellCheck, Palette, AlertCircle, Copy, Check, Replace } from 'lucide-react';
-import { summarize, checkGrammar, changeTone } from '../../services/gemini';
+import { summarize, checkGrammar, changeTone } from '../../services/groq';
 import './AIPanel.css';
 
 const TABS = [
@@ -15,7 +15,7 @@ const TONES = [
   { id: 'professional', label: '💼 Professional' },
 ];
 
-export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
+export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
   const [activeTab, setActiveTab] = useState('summarize');
   const [selectedTone, setSelectedTone] = useState('professional');
   const [loading, setLoading] = useState(false);
@@ -110,7 +110,7 @@ export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
     }
   };
 
-  const isReady = geminiStatus?.running;
+  const isReady = groqStatus?.running;
 
   return (
     <div className="ai-panel">
@@ -125,7 +125,7 @@ export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div className={`ai-panel__status ${isReady ? 'ai-panel__status--online' : 'ai-panel__status--offline'}`}>
             <span className={`status-dot ${isReady ? 'status-dot--online' : 'status-dot--offline'}`}></span>
-            {isReady ? 'Gemini' : 'No Key'}
+            {isReady ? 'Llama 3' : 'No Key'}
           </div>
           <button
             className="ai-panel__settings-btn"
@@ -191,7 +191,7 @@ export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
         {!isReady && !error && (
           <div className="ai-error" style={{ background: 'rgba(245, 158, 11, 0.08)', borderColor: 'rgba(245, 158, 11, 0.2)', color: 'var(--warning)' }}>
             <AlertCircle />
-            <span>Set your Gemini API key in ⚙️ Settings to enable AI features. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-500)', textDecoration: 'underline' }}>Get a free key →</a></span>
+            <span>Set your Groq API key in ⚙️ Settings to enable AI features. <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-500)', textDecoration: 'underline' }}>Get a free key →</a></span>
           </div>
         )}
 
@@ -207,7 +207,7 @@ export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
         {loading && !result && (
           <div className="ai-loading">
             <div className="ai-loading__spinner" />
-            <span className="ai-loading__text">Gemini is thinking...</span>
+            <span className="ai-loading__text">Llama 3 is thinking...</span>
           </div>
         )}
 
