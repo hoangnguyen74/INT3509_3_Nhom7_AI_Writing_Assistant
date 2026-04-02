@@ -1,0 +1,45 @@
+/* ========================================
+   ThemeToggle Component Styles
+   ======================================== */
+
+.theme-toggle {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border-color);
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.theme-toggle__slider {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  transition: transform var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle__slider svg {
+  width: 12px;
+  height: 12px;
+  color: white;
+}
+
+[data-theme="dark"] .theme-toggle__slider {
+  transform: translateX(28px);
+  background: linear-gradient(135deg, var(--primary-400), var(--accent-500));
+}

@@ -1,0 +1,117 @@
+/* ========================================
+   WriteAI Design System — CSS Variables
+   ======================================== */
+
+:root {
+  /* Primary Blue Palette */
+  --primary-50: #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-200: #BFDBFE;
+  --primary-300: #93C5FD;
+  --primary-400: #60A5FA;
+  --primary-500: #3B82F6;
+  --primary-600: #2563EB;
+  --primary-700: #1D4ED8;
+  --primary-800: #1E40AF;
+  --primary-900: #1E3A8A;
+
+  /* Accent / Purple gradient hint */
+  --accent-500: #7C3AED;
+  --accent-600: #6D28D9;
+
+  /* Success / Error / Warning */
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-base: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-2xl: 1.5rem;
+  --font-3xl: 1.875rem;
+
+  /* Transition */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* ========== LIGHT THEME (default) ========== */
+[data-theme="light"] {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F1F5F9;
+  --bg-hover: #E2E8F0;
+  --bg-active: #DBEAFE;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  --border-color: #E2E8F0;
+  --border-hover: #CBD5E1;
+
+  --surface-glass: rgba(255, 255, 255, 0.8);
+  --surface-overlay: rgba(15, 23, 42, 0.4);
+
+  --editor-bg: #FFFFFF;
+  --editor-border: #E2E8F0;
+
+  --scrollbar-bg: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+}
+
+/* ========== DARK THEME ========== */
+[data-theme="dark"] {
+  --bg-primary: #0B1120;
+  --bg-secondary: #131B2E;
+  --bg-tertiary: #1A2440;
+  --bg-hover: #1E293B;
+  --bg-active: #1E3A5F;
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --text-inverse: #0F172A;
+
+  --border-color: #1E293B;
+  --border-hover: #334155;
+
+  --surface-glass: rgba(19, 27, 46, 0.85);
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+
+  --editor-bg: #131B2E;
+  --editor-border: #1E293B;
+
+  --scrollbar-bg: #0B1120;
+  --scrollbar-thumb: #334155;
+}
