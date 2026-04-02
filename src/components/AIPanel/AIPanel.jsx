@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Sparkles, FileText, SpellCheck, Palette, AlertCircle, Copy, Check, Replace } from 'lucide-react';
-import { summarize, checkGrammar, changeTone } from '../../services/ollama';
+import { summarize, checkGrammar, changeTone } from '../../services/gemini';
 import './AIPanel.css';
 
 const TABS = [
@@ -15,7 +15,7 @@ const TONES = [
   { id: 'professional', label: '💼 Professional' },
 ];
 
-export default function AIPanel({ editor, ollamaStatus }) {
+export default function AIPanel({ editor, geminiStatus, onOpenSettings }) {
   const [activeTab, setActiveTab] = useState('summarize');
   const [selectedTone, setSelectedTone] = useState('professional');
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,6 @@ export default function AIPanel({ editor, ollamaStatus }) {
 
   const getText = useCallback(() => {
     if (!editor) return '';
-    // Use selected text if any, otherwise use full document text
     const { from, to } = editor.state.selection;
     if (from !== to) {
       return editor.state.doc.textBetween(from, to, ' ');
@@ -60,8 +59,8 @@ export default function AIPanel({ editor, ollamaStatus }) {
       }
     } catch (err) {
       console.error('AI Error:', err);
-      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
-        setError('Cannot connect to Ollama. Make sure Ollama is running on localhost:11434 and OLLAMA_ORIGINS=* is set.');
+      if (err.message?.includes('API key')) {
+        setError(err.message + ' Click the ⚙️ button above to configure.');
       } else {
         setError(`Error: ${err.message}`);
       }
@@ -81,10 +80,8 @@ export default function AIPanel({ editor, ollamaStatus }) {
     
     const { from, to } = editor.state.selection;
     if (from !== to) {
-      // Replace selected text
       editor.chain().focus().deleteSelection().insertContent(result).run();
     } else {
-      // Replace all content
       editor.commands.setContent(`<p>${result.replace(/\n/g, '</p><p>')}</p>`);
     }
   }, [editor, result]);
@@ -113,6 +110,8 @@ export default function AIPanel({ editor, ollamaStatus }) {
     }
   };
 
+  const isReady = geminiStatus?.running;
+
   return (
     <div className="ai-panel">
       {/* Header */}
@@ -123,9 +122,18 @@ export default function AIPanel({ editor, ollamaStatus }) {
           </div>
           AI Assistant
         </div>
-        <div className={`ai-panel__status ${ollamaStatus?.running ? 'ai-panel__status--online' : 'ai-panel__status--offline'}`}>
-          <span className={`status-dot ${ollamaStatus?.running ? 'status-dot--online' : 'status-dot--offline'}`}></span>
-          {ollamaStatus?.running ? 'Online' : 'Offline'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={`ai-panel__status ${isReady ? 'ai-panel__status--online' : 'ai-panel__status--offline'}`}>
+            <span className={`status-dot ${isReady ? 'status-dot--online' : 'status-dot--offline'}`}></span>
+            {isReady ? 'Gemini' : 'No Key'}
+          </div>
+          <button
+            className="ai-panel__settings-btn"
+            onClick={onOpenSettings}
+            title="API Settings"
+          >
+            ⚙️
+          </button>
         </div>
       </div>
 
@@ -164,7 +172,7 @@ export default function AIPanel({ editor, ollamaStatus }) {
         <button
           className="ai-action-btn"
           onClick={handleAction}
-          disabled={loading || !ollamaStatus?.running}
+          disabled={loading || !isReady}
         >
           {loading ? (
             <>
@@ -179,6 +187,14 @@ export default function AIPanel({ editor, ollamaStatus }) {
           )}
         </button>
 
+        {/* No API Key hint */}
+        {!isReady && !error && (
+          <div className="ai-error" style={{ background: 'rgba(245, 158, 11, 0.08)', borderColor: 'rgba(245, 158, 11, 0.2)', color: 'var(--warning)' }}>
+            <AlertCircle />
+            <span>Set your Gemini API key in ⚙️ Settings to enable AI features. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-500)', textDecoration: 'underline' }}>Get a free key →</a></span>
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div className="ai-error">
@@ -191,7 +207,7 @@ export default function AIPanel({ editor, ollamaStatus }) {
         {loading && !result && (
           <div className="ai-loading">
             <div className="ai-loading__spinner" />
-            <span className="ai-loading__text">AI is thinking...</span>
+            <span className="ai-loading__text">Gemini is thinking...</span>
           </div>
         )}
 
@@ -220,7 +236,7 @@ export default function AIPanel({ editor, ollamaStatus }) {
         )}
 
         {/* Empty State */}
-        {!loading && !result && !error && (
+        {!loading && !result && !error && isReady && (
           <div className="ai-empty">
             <div className="ai-empty__icon">
               {getEmptyIcon()}

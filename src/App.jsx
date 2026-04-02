@@ -1,26 +1,124 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { PenLine, Sparkles, WifiOff } from 'lucide-react';
+import { PenLine, Sparkles, X, Eye, EyeOff, Key } from 'lucide-react';
 import Editor from './components/Editor/Editor';
 import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
-import { checkOllamaStatus } from './services/ollama';
+import { checkGeminiStatus, getApiKey, setApiKey } from './services/gemini';
 import './App.css';
 
+function SettingsModal({ isOpen, onClose, onSave }) {
+  const [key, setKey] = useState('');
+  const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setKey(getApiKey());
+      setTestResult(null);
+    }
+  }, [isOpen]);
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    // Temporarily save key to test
+    const oldKey = getApiKey();
+    setApiKey(key);
+    const status = await checkGeminiStatus();
+    if (!status.running) {
+      setApiKey(oldKey); // restore old key on failure
+    }
+    setTestResult(status);
+    setTesting(false);
+  };
+
+  const handleSave = () => {
+    setApiKey(key);
+    onSave();
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="settings-overlay" onClick={onClose}>
+      <div className="settings-modal fade-in" onClick={e => e.stopPropagation()}>
+        <div className="settings-modal__header">
+          <h2>⚙️ API Settings</h2>
+          <button className="settings-modal__close" onClick={onClose}><X /></button>
+        </div>
+        <div className="settings-modal__body">
+          <label className="settings-label">
+            <Key size={14} />
+            Gemini API Key
+          </label>
+          <p className="settings-hint">
+            Get a free API key from{' '}
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">
+              Google AI Studio →
+            </a>
+          </p>
+          <div className="settings-input-group">
+            <input
+              type={showKey ? 'text' : 'password'}
+              className="settings-input"
+              value={key}
+              onChange={e => setKey(e.target.value)}
+              placeholder="AIzaSy..."
+            />
+            <button
+              className="settings-input-toggle"
+              onClick={() => setShowKey(!showKey)}
+              title={showKey ? 'Hide key' : 'Show key'}
+            >
+              {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+
+          {testResult && (
+            <div className={`settings-test-result ${testResult.running ? 'success' : 'error'}`}>
+              {testResult.running ? '✅ API key is valid! Connected to Gemini.' : `❌ ${testResult.error}`}
+            </div>
+          )}
+
+          <div className="settings-modal__actions">
+            <button
+              className="settings-btn settings-btn--secondary"
+              onClick={handleTest}
+              disabled={!key || testing}
+            >
+              {testing ? 'Testing...' : 'Test Connection'}
+            </button>
+            <button
+              className="settings-btn settings-btn--primary"
+              onClick={handleSave}
+              disabled={!key}
+            >
+              Save Key
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  const [ollamaStatus, setOllamaStatus] = useState({ running: false, models: [] });
+  const [geminiStatus, setGeminiStatus] = useState({ running: false });
+  const [showSettings, setShowSettings] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const editorRef = useRef(null);
 
-  // Check Ollama status on mount and periodically
-  useEffect(() => {
-    const check = async () => {
-      const status = await checkOllamaStatus();
-      setOllamaStatus(status);
-    };
-    check();
-    const interval = setInterval(check, 10000); // Check every 10 seconds
-    return () => clearInterval(interval);
+  const checkStatus = useCallback(async () => {
+    const status = await checkGeminiStatus();
+    setGeminiStatus(status);
   }, []);
+
+  // Check Gemini status on mount
+  useEffect(() => {
+    checkStatus();
+  }, [checkStatus]);
 
   // Set initial theme
   useEffect(() => {
@@ -56,14 +154,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Connection warning banner */}
-      {!ollamaStatus.running && (
-        <div className="connection-banner">
-          <WifiOff />
-          <span>Ollama is not running. Start Ollama to use AI features.</span>
-        </div>
-      )}
-
       {/* Main Content */}
       <main className="app-main">
         <div className="editor-container">
@@ -72,7 +162,8 @@ export default function App() {
 
         <AIPanel
           editor={editorRef.current}
-          ollamaStatus={ollamaStatus}
+          geminiStatus={geminiStatus}
+          onOpenSettings={() => setShowSettings(true)}
         />
 
         {/* Mobile overlay */}
@@ -81,6 +172,13 @@ export default function App() {
           onClick={() => setShowAIPanel(false)}
         />
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        onSave={checkStatus}
+      />
     </div>
   );
 }

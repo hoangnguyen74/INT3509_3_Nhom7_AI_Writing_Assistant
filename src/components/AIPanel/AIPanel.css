@@ -88,6 +88,26 @@
   background: var(--error);
 }
 
+/* ========== Settings Button ========== */
+.ai-panel__settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.ai-panel__settings-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary-400);
+}
+
 /* ========== Tabs ========== */
 .ai-panel__tabs {
   display: flex;
