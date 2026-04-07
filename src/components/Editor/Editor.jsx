@@ -4,6 +4,14 @@ import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
+import { Image } from '@tiptap/extension-image';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TaskList } from '@tiptap/extension-task-list';
+import { TaskItem } from '@tiptap/extension-task-item';
+import { Link } from '@tiptap/extension-link';
 import Toolbar from './Toolbar';
 import InlineAIMenu from './InlineAIMenu';
 import './Editor.css';
@@ -21,6 +29,24 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
       Highlight.configure({ multicolor: false }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: true,
+      }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
       }),
     ],
     content: initialContent || '<p></p>',
