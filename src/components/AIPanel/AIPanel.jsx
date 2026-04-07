@@ -1,115 +1,26 @@
-import { useState, useCallback } from 'react';
-import { Sparkles, FileText, SpellCheck, Palette, AlertCircle, Copy, Check, Replace } from 'lucide-react';
-import { summarize, checkGrammar, changeTone } from '../../services/groq';
+// ========================================
+// AI Panel — 4-section AI workspace
+// ========================================
+import { useState } from 'react';
+import {
+  Sparkles, PenTool, Rocket, Languages, MessageCircle,
+  AlertCircle, Settings,
+} from 'lucide-react';
+import WritingTools from './WritingTools';
+import AICompose from './AICompose';
+import AITranslate from './AITranslate';
+import AIChat from './AIChat';
 import './AIPanel.css';
 
-const TABS = [
-  { id: 'summarize', label: 'Summarize', icon: <FileText /> },
-  { id: 'grammar', label: 'Grammar', icon: <SpellCheck /> },
-  { id: 'tone', label: 'Tone', icon: <Palette /> },
-];
-
-const TONES = [
-  { id: 'formal', label: '🎩 Formal' },
-  { id: 'friendly', label: '😊 Friendly' },
-  { id: 'professional', label: '💼 Professional' },
+const SECTIONS = [
+  { id: 'writing', label: 'Writing', icon: PenTool },
+  { id: 'compose', label: 'Compose', icon: Rocket },
+  { id: 'translate', label: 'Translate', icon: Languages },
+  { id: 'chat', label: 'Chat', icon: MessageCircle },
 ];
 
 export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
-  const [activeTab, setActiveTab] = useState('summarize');
-  const [selectedTone, setSelectedTone] = useState('professional');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState('');
-  const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  const getText = useCallback(() => {
-    if (!editor) return '';
-    const { from, to } = editor.state.selection;
-    if (from !== to) {
-      return editor.state.doc.textBetween(from, to, ' ');
-    }
-    return editor.state.doc.textContent;
-  }, [editor]);
-
-  const handleAction = useCallback(async () => {
-    const text = getText();
-    if (!text.trim()) {
-      setError('Please write or paste some text in the editor first.');
-      return;
-    }
-
-    setLoading(true);
-    setResult('');
-    setError('');
-
-    try {
-      const onChunk = (partial) => setResult(partial);
-
-      switch (activeTab) {
-        case 'summarize':
-          await summarize(text, onChunk);
-          break;
-        case 'grammar':
-          await checkGrammar(text, onChunk);
-          break;
-        case 'tone':
-          await changeTone(text, selectedTone, onChunk);
-          break;
-      }
-    } catch (err) {
-      console.error('AI Error:', err);
-      if (err.message?.includes('API key')) {
-        setError(err.message + ' Click the ⚙️ button above to configure.');
-      } else {
-        setError(`Error: ${err.message}`);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab, selectedTone, getText]);
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(result);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [result]);
-
-  const handleApply = useCallback(() => {
-    if (!editor || !result) return;
-    
-    const { from, to } = editor.state.selection;
-    if (from !== to) {
-      editor.chain().focus().deleteSelection().insertContent(result).run();
-    } else {
-      editor.commands.setContent(`<p>${result.replace(/\n/g, '</p><p>')}</p>`);
-    }
-  }, [editor, result]);
-
-  const getActionLabel = () => {
-    switch (activeTab) {
-      case 'summarize': return 'Summarize Text';
-      case 'grammar': return 'Check Grammar';
-      case 'tone': return `Apply ${selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1)} Tone`;
-    }
-  };
-
-  const getEmptyMessage = () => {
-    switch (activeTab) {
-      case 'summarize': return 'Click the button to generate a concise summary of your text.';
-      case 'grammar': return 'Click the button to analyze your text for grammar, spelling, and style issues.';
-      case 'tone': return 'Select a tone and click the button to rewrite your text.';
-    }
-  };
-
-  const getEmptyIcon = () => {
-    switch (activeTab) {
-      case 'summarize': return <FileText />;
-      case 'grammar': return <SpellCheck />;
-      case 'tone': return <Palette />;
-    }
-  };
-
+  const [activeSection, setActiveSection] = useState('writing');
   const isReady = groqStatus?.running;
 
   return (
@@ -132,117 +43,60 @@ export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
             onClick={onOpenSettings}
             title="API Settings"
           >
-            ⚙️
+            <Settings size={16} />
           </button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="ai-panel__tabs">
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            className={`ai-panel__tab ${activeTab === tab.id ? 'ai-panel__tab--active' : ''}`}
-            onClick={() => { setActiveTab(tab.id); setResult(''); setError(''); }}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
+      {/* Section Navigation */}
+      <div className="ai-panel__nav">
+        {SECTIONS.map(section => {
+          const Icon = section.icon;
+          return (
+            <button
+              key={section.id}
+              className={`ai-panel__nav-btn ${activeSection === section.id ? 'ai-panel__nav-btn--active' : ''}`}
+              onClick={() => setActiveSection(section.id)}
+              title={section.label}
+            >
+              <Icon size={16} />
+              <span>{section.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Content */}
       <div className="ai-panel__content">
-        {/* Tone Selector (only for tone tab) */}
-        {activeTab === 'tone' && (
-          <div className="tone-selector">
-            {TONES.map(tone => (
-              <button
-                key={tone.id}
-                className={`tone-btn ${selectedTone === tone.id ? 'tone-btn--active' : ''}`}
-                onClick={() => setSelectedTone(tone.id)}
-              >
-                {tone.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Action Button */}
-        <button
-          className="ai-action-btn"
-          onClick={handleAction}
-          disabled={loading || !isReady}
-        >
-          {loading ? (
-            <>
-              <div className="ai-loading__spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
-              Processing...
-            </>
-          ) : (
-            <>
-              <Sparkles />
-              {getActionLabel()}
-            </>
-          )}
-        </button>
-
         {/* No API Key hint */}
-        {!isReady && !error && (
-          <div className="ai-error" style={{ background: 'rgba(245, 158, 11, 0.08)', borderColor: 'rgba(245, 158, 11, 0.2)', color: 'var(--warning)' }}>
-            <AlertCircle />
-            <span>Set your Groq API key in ⚙️ Settings to enable AI features. <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-500)', textDecoration: 'underline' }}>Get a free key →</a></span>
+        {!isReady && (
+          <div className="ai-panel__no-key">
+            <AlertCircle size={16} />
+            <span>
+              Set your Groq API key in{' '}
+              <button onClick={onOpenSettings} className="ai-panel__key-link">
+                ⚙️ Settings
+              </button>
+              {' '}to enable AI features.{' '}
+              <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
+                Get a free key →
+              </a>
+            </span>
           </div>
         )}
 
-        {/* Error */}
-        {error && (
-          <div className="ai-error">
-            <AlertCircle />
-            <span>{error}</span>
-          </div>
+        {/* Sections */}
+        {activeSection === 'writing' && (
+          <WritingTools editor={editor} isReady={isReady} />
         )}
-
-        {/* Loading */}
-        {loading && !result && (
-          <div className="ai-loading">
-            <div className="ai-loading__spinner" />
-            <span className="ai-loading__text">Llama 3 is thinking...</span>
-          </div>
+        {activeSection === 'compose' && (
+          <AICompose editor={editor} isReady={isReady} />
         )}
-
-        {/* Result */}
-        {result && (
-          <div className="ai-result fade-in">
-            <div className="ai-result__header">
-              <span className="ai-result__label">
-                {activeTab === 'summarize' ? '📝 Summary' : activeTab === 'grammar' ? '✅ Analysis' : '✨ Rewritten'}
-              </span>
-              <div className="ai-result__actions">
-                <button className="ai-result__action-btn" onClick={handleCopy} title="Copy to clipboard">
-                  {copied ? <Check /> : <Copy />}
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-                {(activeTab === 'tone' || activeTab === 'summarize') && (
-                  <button className="ai-result__action-btn" onClick={handleApply} title="Replace text in editor">
-                    <Replace />
-                    Apply
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="ai-result__text">{result}</div>
-          </div>
+        {activeSection === 'translate' && (
+          <AITranslate editor={editor} isReady={isReady} />
         )}
-
-        {/* Empty State */}
-        {!loading && !result && !error && isReady && (
-          <div className="ai-empty">
-            <div className="ai-empty__icon">
-              {getEmptyIcon()}
-            </div>
-            <p className="ai-empty__text">{getEmptyMessage()}</p>
-          </div>
+        {activeSection === 'chat' && (
+          <AIChat editor={editor} isReady={isReady} />
         )}
       </div>
     </div>

@@ -5,18 +5,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import Toolbar from './Toolbar';
+import InlineAIMenu from './InlineAIMenu';
 import './Editor.css';
 
-const INITIAL_CONTENT = `<h2>Welcome to WriteAI ✨</h2>
-<p>Start writing here, or paste your text to get started. Use the <strong>AI tools</strong> on the right panel to:</p>
-<ul>
-  <li><strong>Summarize</strong> — Get a concise summary of your text</li>
-  <li><strong>Grammar Check</strong> — Find and fix grammatical errors</li>
-  <li><strong>Tone Changer</strong> — Adjust the tone to formal, friendly, or professional</li>
-</ul>
-<p>Try it out! Select some text or use the full document for AI analysis. 🚀</p>`;
-
-export default function Editor({ onEditorReady }) {
+export default function Editor({ initialContent, onEditorReady, onUpdate }) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -31,9 +23,9 @@ export default function Editor({ onEditorReady }) {
         types: ['heading', 'paragraph'],
       }),
     ],
-    content: INITIAL_CONTENT,
-    onUpdate: () => {
-      // onUpdate can be used for auto-save etc.
+    content: initialContent || '<p></p>',
+    onUpdate: ({ editor }) => {
+      onUpdate?.(editor.getHTML());
     },
     onCreate: ({ editor }) => {
       onEditorReady?.(editor);
@@ -55,6 +47,7 @@ export default function Editor({ onEditorReady }) {
       <Toolbar editor={editor} />
       <div className="editor-content">
         <EditorContent editor={editor} />
+        <InlineAIMenu editor={editor} />
       </div>
       <div className="editor-statusbar">
         <div className="statusbar-info">

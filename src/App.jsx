@@ -1,11 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { PenLine, Sparkles, X, Eye, EyeOff, Key } from 'lucide-react';
+import { PenLine, Sparkles, Menu, X, Eye, EyeOff, Key } from 'lucide-react';
+import { AppProvider, useApp } from './contexts/AppContext';
+import AuthPage from './pages/AuthPage';
+import OnboardingFlow from './components/Onboarding/OnboardingFlow';
+import Sidebar from './components/Sidebar/Sidebar';
 import Editor from './components/Editor/Editor';
 import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import { checkGroqStatus, getApiKey, setApiKey } from './services/groq';
+import { updateDocument as updateDocInStorage } from './services/storage';
 import './App.css';
 
+// ========================================
+// Settings Modal (kept as overlay for quick API key access)
+// ========================================
 function SettingsModal({ isOpen, onClose, onSave }) {
   const [key, setKey] = useState('');
   const [showKey, setShowKey] = useState(false);
@@ -22,12 +30,11 @@ function SettingsModal({ isOpen, onClose, onSave }) {
   const handleTest = async () => {
     setTesting(true);
     setTestResult(null);
-    // Temporarily save key to test
     const oldKey = getApiKey();
     setApiKey(key);
     const status = await checkGroqStatus();
     if (!status.running) {
-      setApiKey(oldKey); // restore old key on failure
+      setApiKey(oldKey);
     }
     setTestResult(status);
     setTesting(false);
@@ -104,44 +111,130 @@ function SettingsModal({ isOpen, onClose, onSave }) {
   );
 }
 
-export default function App() {
+// ========================================
+// Main App Content (inside AppProvider)
+// ========================================
+function AppContent() {
+  const {
+    user, loading, settings, currentDoc, sidebarOpen,
+    setSidebarOpen, setCurrentDoc, updateDocument, addToast,
+  } = useApp();
+
   const [groqStatus, setGroqStatus] = useState({ running: false });
   const [showSettings, setShowSettings] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const editorRef = useRef(null);
+  const autoSaveTimerRef = useRef(null);
 
+  // Check Groq status
   const checkStatus = useCallback(async () => {
     const status = await checkGroqStatus();
     setGroqStatus(status);
   }, []);
 
-  // Check Groq status on mount
   useEffect(() => {
-    checkStatus();
-  }, [checkStatus]);
+    if (user) {
+      checkStatus();
+    }
+  }, [user, checkStatus]);
 
-  // Set initial theme
+  // Check if onboarding needed
   useEffect(() => {
-    const saved = localStorage.getItem('writeai-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', saved);
+    if (user && !settings.onboardingCompleted) {
+      setShowOnboarding(true);
+    }
+  }, [user, settings.onboardingCompleted]);
+
+  // Auto-save
+  const handleEditorUpdate = useCallback((content) => {
+    if (!currentDoc) return;
+
+    // Debounce auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(async () => {
+      try {
+        const updated = await updateDocInStorage(currentDoc.id, { content });
+        updateDocument(updated);
+      } catch (err) {
+        console.error('Auto-save error:', err);
+      }
+    }, settings.autoSaveInterval || 2000);
+  }, [currentDoc, settings.autoSaveInterval, updateDocument]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
   }, []);
 
   const handleEditorReady = useCallback((editor) => {
     editorRef.current = editor;
   }, []);
 
+  const handleOnboardingComplete = useCallback(() => {
+    setShowOnboarding(false);
+    checkStatus();
+  }, [checkStatus]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <div className="app-loading__spinner" />
+        <span>Loading WriteAI...</span>
+      </div>
+    );
+  }
+
+  // Not logged in → Auth Page
+  if (!user) {
+    return <AuthPage />;
+  }
+
+  // Onboarding
+  if (showOnboarding) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
+
+  // Main App
   return (
     <div className="app">
       {/* Header */}
       <header className="app-header">
-        <div className="app-logo">
-          <div className="app-logo__icon">
-            <PenLine />
+        <div className="app-header__left">
+          {!sidebarOpen && (
+            <button
+              className="sidebar-toggle-btn"
+              onClick={() => setSidebarOpen(true)}
+              title="Open sidebar"
+            >
+              <Menu size={18} />
+            </button>
+          )}
+          <div className="app-logo">
+            <div className="app-logo__icon">
+              <PenLine />
+            </div>
+            <h1 className="app-logo__text">
+              Write<span>AI</span>
+            </h1>
           </div>
-          <h1 className="app-logo__text">
-            Write<span>AI</span>
-          </h1>
         </div>
+
+        {/* Document title */}
+        {currentDoc && (
+          <div className="app-header__doc-title">
+            {currentDoc.title || 'Untitled'}
+          </div>
+        )}
+
         <div className="app-header__actions">
           <ThemeToggle />
           <button
@@ -156,21 +249,45 @@ export default function App() {
 
       {/* Main Content */}
       <main className="app-main">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Editor Area */}
         <div className="editor-container">
-          <Editor onEditorReady={handleEditorReady} />
+          {currentDoc ? (
+            <Editor
+              key={currentDoc.id}
+              initialContent={currentDoc.content}
+              onEditorReady={handleEditorReady}
+              onUpdate={handleEditorUpdate}
+            />
+          ) : (
+            <div className="editor-empty">
+              <div className="editor-empty__icon">
+                <PenLine size={48} />
+              </div>
+              <h2>Select or create a document</h2>
+              <p>Choose a document from the sidebar, or create a new one to get started.</p>
+            </div>
+          )}
         </div>
 
-        <AIPanel
-          editor={editorRef.current}
-          groqStatus={groqStatus}
-          onOpenSettings={() => setShowSettings(true)}
-        />
+        {/* AI Panel */}
+        <div className={`ai-panel-wrapper ${showAIPanel ? 'ai-panel-wrapper--mobile-open' : ''}`}>
+          <AIPanel
+            editor={editorRef.current}
+            groqStatus={groqStatus}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+        </div>
 
         {/* Mobile overlay */}
-        <div
-          className={`mobile-overlay ${showAIPanel ? 'visible' : ''}`}
-          onClick={() => setShowAIPanel(false)}
-        />
+        {showAIPanel && (
+          <div
+            className="mobile-overlay visible"
+            onClick={() => setShowAIPanel(false)}
+          />
+        )}
       </main>
 
       {/* Settings Modal */}
@@ -179,6 +296,19 @@ export default function App() {
         onClose={() => setShowSettings(false)}
         onSave={checkStatus}
       />
+
+      {/* Toast Notifications (simple version for now) */}
     </div>
+  );
+}
+
+// ========================================
+// Root App (wrapped in Provider)
+// ========================================
+export default function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 }
