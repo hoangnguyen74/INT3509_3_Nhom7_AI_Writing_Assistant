@@ -93,13 +93,19 @@ export default function FindReplace({ editor, isOpen, onClose }) {
 
   const goToMatch = useCallback((match) => {
     if (!editor || !match) return;
-    editor.chain().focus().setTextSelection({ from: match.from, to: match.to }).run();
+    // Set selection WITHOUT stealing focus from find input
+    const tr = editor.state.tr.setSelection(
+      editor.state.selection.constructor.create(editor.state.doc, match.from, match.to)
+    );
+    editor.view.dispatch(tr);
     // Scroll into view
     const domAtPos = editor.view.domAtPos(match.from);
     if (domAtPos?.node) {
       const el = domAtPos.node.nodeType === 3 ? domAtPos.node.parentElement : domAtPos.node;
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    // Keep focus on find input
+    setTimeout(() => findInputRef.current?.focus(), 0);
   }, [editor]);
 
   const goNext = useCallback(() => {
