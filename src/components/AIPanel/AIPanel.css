@@ -538,6 +538,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  margin-top: 12px;
 }
 
 .compose-generate-btn:hover:not(:disabled) {
