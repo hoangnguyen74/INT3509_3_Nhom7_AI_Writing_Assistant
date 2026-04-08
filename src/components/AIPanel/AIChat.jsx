@@ -7,8 +7,10 @@ import {
   Loader2, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { chat } from '../../services/groq';
+import { useApp } from '../../contexts/AppContext';
 
 export default function AIChat({ editor, isReady }) {
+  const { checkApiQuota, openPaywall, settings } = useApp();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,13 @@ export default function AIChat({ editor, isReady }) {
   }, [messages]);
 
   const handleSend = useCallback(async () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || !isReady || loading) return;
+
+    const hasQuota = await checkApiQuota();
+    if (!hasQuota) {
+      openPaywall();
+      return;
+    }
 
     const userMessage = { role: 'user', content: input.trim() };
     const newMessages = [...messages, userMessage];
@@ -47,14 +55,17 @@ export default function AIChat({ editor, isReady }) {
       // Add placeholder for streaming
       setMessages(prev => [...prev, { role: 'assistant', content: '...' }]);
 
-      await chat(chatHistory, (partial) => {
+      const onChunk = (partial) => {
         aiResponse = partial;
         setMessages(prev => {
           const updated = [...prev];
           updated[updated.length - 1] = { role: 'assistant', content: partial };
           return updated;
         });
-      }, editorContext);
+      };
+
+      const persona = settings.activePersona || 'general';
+      await chat(chatHistory, onChunk, editorContext, persona);
     } catch (err) {
       setMessages(prev => {
         const updated = [...prev];

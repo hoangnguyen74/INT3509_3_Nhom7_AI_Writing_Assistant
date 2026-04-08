@@ -3,24 +3,22 @@
 // ========================================
 import { useState } from 'react';
 import {
-  Sparkles, PenTool, Rocket, Languages, MessageCircle,
+  Sparkles, Rocket, Languages, MessageCircle,
   AlertCircle, Settings,
 } from 'lucide-react';
-import WritingTools from './WritingTools';
 import AICompose from './AICompose';
 import AITranslate from './AITranslate';
 import AIChat from './AIChat';
 import './AIPanel.css';
 
 const SECTIONS = [
-  { id: 'writing', label: 'Writing', icon: PenTool },
   { id: 'compose', label: 'Compose', icon: Rocket },
   { id: 'translate', label: 'Translate', icon: Languages },
   { id: 'chat', label: 'Chat', icon: MessageCircle },
 ];
 
 export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
-  const [activeSection, setActiveSection] = useState('writing');
+  const [activeSection, setActiveSection] = useState('compose');
   const isReady = groqStatus?.running;
 
   return (
@@ -86,9 +84,6 @@ export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
         )}
 
         {/* Sections */}
-        {activeSection === 'writing' && (
-          <WritingTools editor={editor} isReady={isReady} />
-        )}
         {activeSection === 'compose' && (
           <AICompose editor={editor} isReady={isReady} />
         )}

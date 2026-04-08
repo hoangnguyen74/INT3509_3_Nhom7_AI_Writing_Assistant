@@ -7,6 +7,7 @@ import {
   Loader2, AlertCircle
 } from 'lucide-react';
 import { translate, LANGUAGE_NAMES } from '../../services/groq';
+import { useApp } from '../../contexts/AppContext';
 
 const LANGUAGES = [
   { id: 'auto', label: '🔍 Auto Detect', flag: '🔍' },
@@ -25,6 +26,7 @@ const LANGUAGES = [
 ];
 
 export default function AITranslate({ editor, isReady }) {
+  const { checkApiQuota, openPaywall } = useApp();
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('en');
   const [loading, setLoading] = useState(false);

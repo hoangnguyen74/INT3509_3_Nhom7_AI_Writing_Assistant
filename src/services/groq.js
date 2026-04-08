@@ -105,121 +105,100 @@ async function groqGenerate(systemPrompt, userPrompt, onChunk, options = {}) {
   return fullResponse;
 }
 
+// ==================== Utilities & Prompts ====================
+
+const PERSONA_PROMPTS = {
+  general: 'You are an intelligent, professional writing assistant.',
+  it: 'You are a Senior Tech Lead and IT Expert. Use precise, technical, and analytical language suitable for developers and engineers.',
+  sales: 'You are an elite Sales & Marketing Manager. Focus on persuasion, engagement, emotional hook, and conversion-oriented copy.',
+  academic: 'You are a rigorous Academic Researcher. Maintain a formal, objective, scholarly tone, avoiding colloquialisms.'
+};
+
+function buildSystem(task, format = 'Return ONLY the requested output. NO conversational padding. NO "Here is your text".', persona = 'general') {
+  const pContext = PERSONA_PROMPTS[persona] || PERSONA_PROMPTS.general;
+  return `ROLE: ${pContext}\nTASK: ${task}\nFORMAT RULES: ${format}\nMatch the language of the user's input unless explicitly specified otherwise.`;
+}
+
 // ==================== Chat Function (multi-turn) ====================
 
-export async function chat(messages, onChunk, editorContext = '') {
-  const systemPrompt = `You are WriteAI, an intelligent writing assistant. You help users with writing, editing, brainstorming, and answering questions about their content.
-${editorContext ? `\nThe user is currently working on the following text:\n"""\n${editorContext}\n"""` : ''}
-Be helpful, concise, and professional. Format your responses with markdown when appropriate. If the user writes in Vietnamese, respond in Vietnamese. If in English, respond in English.`;
+export async function chat(messages, onChunk, editorContext = '', persona = 'general') {
+  const pContext = PERSONA_PROMPTS[persona] || PERSONA_PROMPTS.general;
+  const systemPrompt = `ROLE: ${pContext}\nYou help users with writing, editing, brainstorming, and questions.
+${editorContext ? `\nCONTEXT: The user is currently working on the following text in their editor:\n"""\n${editorContext}\n"""` : ''}
+FORMAT: Be helpful, concise, and professional. Use markdown formatting. Reply in the user's language.`;
 
   return groqGenerate(systemPrompt, messages, onChunk);
 }
 
 // ==================== Writing Tools ====================
 
-export async function summarize(text, onChunk) {
-  return groqGenerate(
-    'You are a professional text summarizer. Preserve key points and main ideas. Match the language of the input.',
-    `Summarize the following text concisely:\n\n"""\n${text}\n"""\n\nSummary:`,
-    onChunk
-  );
+export async function summarize(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Summarize the input text concisely, preserving key ideas and main points.', undefined, persona);
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function checkGrammar(text, onChunk) {
-  return groqGenerate(
-    'You are an expert grammar checker. For each issue: quote the original, explain the problem, suggest a correction. If no errors, confirm the text is well-written. Match the language of the input.',
-    `Analyze this text for grammar, spelling, punctuation, and style:\n\n"""\n${text}\n"""\n\nAnalysis:`,
-    onChunk
+export async function checkGrammar(text, onChunk, persona = 'general') {
+  const sys = buildSystem(
+    'Act as an expert proofreader. Check for grammar, spelling, punctuation, and style issues.',
+    'Output a brief list of improvements, then output the fully corrected text separated by "---". NEVER say "Here is the result".',
+    persona
   );
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function changeTone(text, tone, onChunk) {
-  const toneDescriptions = {
-    formal: 'formal and professional, suitable for business or academic writing',
-    friendly: 'friendly and casual, warm and approachable',
-    professional: 'professional yet approachable, clear and confident',
-    academic: 'scholarly and precise, using academic language and conventions',
-    creative: 'creative and expressive, using vivid language and imagery',
-    simple: 'simple and easy to understand, avoiding complex vocabulary',
-  };
-  return groqGenerate(
-    `You are a writing assistant specializing in tone adjustment. Rewrite text in a ${tone} tone: ${toneDescriptions[tone] || toneDescriptions.professional}. Maintain original meaning. Match the language.`,
-    `Rewrite this text in a ${tone} tone:\n\n"""\n${text}\n"""\n\nRewritten:`,
-    onChunk
+export async function changeTone(text, tone, onChunk, persona = 'general') {
+  const sys = buildSystem(
+    `Rewrite the text in a specifically [${tone}] tone. Ensure original meaning is kept but vocabulary and sentence structure reflect the requested tone.`,
+    undefined, 
+    persona
   );
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function paraphrase(text, onChunk) {
-  return groqGenerate(
-    'You are a paraphrasing expert. Rewrite the text using different words and sentence structures while keeping the same meaning. Match the language.',
-    `Paraphrase the following text:\n\n"""\n${text}\n"""\n\nParaphrased:`,
-    onChunk
-  );
+export async function paraphrase(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Rewrite and paraphrase the text using different words and sentence structures while keeping the original meaning intact.', undefined, persona);
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function expandText(text, onChunk) {
-  return groqGenerate(
-    'You are a writing expander. Elaborate on the text with more details, examples, and explanations while maintaining the original message. Match the language.',
-    `Expand and elaborate on this text:\n\n"""\n${text}\n"""\n\nExpanded version:`,
-    onChunk
-  );
+export async function expandText(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Elaborate and expand on the text. Add relevant details, examples, or logical explanations to add depth.', undefined, persona);
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function shortenText(text, onChunk) {
-  return groqGenerate(
-    'You are a text condenser. Make the text shorter and more concise while keeping all essential information. Match the language.',
-    `Shorten this text while keeping the key information:\n\n"""\n${text}\n"""\n\nShortened:`,
-    onChunk
-  );
+export async function shortenText(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Make the text significantly shorter and more concise. Remove fluff while retaining core information.', undefined, persona);
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function improveReadability(text, onChunk) {
-  return groqGenerate(
-    'You are a readability expert. Improve the text by: simplifying complex sentences, using active voice, improving flow, and making it more engaging. Match the language.',
-    `Improve the readability of this text:\n\n"""\n${text}\n"""\n\nImproved version:`,
-    onChunk
-  );
+export async function improveReadability(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Improve the flow, rhythm, and clarity of the text. Use active voice and eliminate awkward phrasing.', undefined, persona);
+  return groqGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);
 }
 
 // ==================== Compose ====================
 
-export async function compose(prompt, contentType, tone, language, onChunk) {
-  const typeInstructions = {
-    email: 'Write a professional email',
-    blog: 'Write a blog post',
-    essay: 'Write an essay',
-    report: 'Write a report',
-    letter: 'Write a letter',
-    social: 'Write a social media post',
-    story: 'Write a short story',
-    poem: 'Write a poem',
-    review: 'Write a review',
-  };
-
-  const langInstruction = language === 'vi' ? 'Write in Vietnamese.' : language === 'en' ? 'Write in English.' : 'Match the language of the prompt.';
-  const toneInstruction = tone ? `Use a ${tone} tone.` : '';
-
-  return groqGenerate(
-    `You are a creative writing assistant. ${typeInstructions[contentType] || 'Write content'} based on the user's prompt. ${toneInstruction} ${langInstruction} Be creative, well-structured, and engaging.`,
-    prompt,
-    onChunk
+export async function compose(prompt, contentType, tone, language, onChunk, persona = 'general') {
+  const langStr = language === 'vi' ? 'Vietnamese' : language === 'en' ? 'English' : 'the language of the prompt';
+  const sys = buildSystem(
+    `Write a creative and engaging ${contentType}. Focus on the user's prompt. Language required: ${langStr}. Required tone: ${tone || 'neutral'}.`,
+    undefined,
+    persona
   );
+  return groqGenerate(sys, prompt, onChunk);
 }
 
-export async function continueWriting(text, onChunk) {
-  return groqGenerate(
-    'You are a writing assistant. Continue writing from where the text left off. Maintain the same style, tone, and context. Match the language. Write 2-4 paragraphs.',
-    `Continue writing from here:\n\n"""\n${text}\n"""\n\nContinuation:`,
-    onChunk
-  );
+export async function continueWriting(text, onChunk, persona = 'general') {
+  const sys = buildSystem('Continue writing from where the text left off. Maintain style, context, and logical flow. Produce about 2-3 paragraphs.', undefined, persona);
+  return groqGenerate(sys, `Input to continue from:\n"""\n${text}\n"""`, onChunk);
 }
 
-export async function generateOutline(topic, contentType, onChunk) {
-  return groqGenerate(
-    'You are a content planner. Generate a detailed outline with main sections and sub-points. Use markdown formatting with headers and bullet points. Match the language of the topic.',
-    `Generate a detailed outline for a ${contentType || 'document'} about:\n\n"${topic}"\n\nOutline:`,
-    onChunk
+export async function generateOutline(topic, contentType, onChunk, persona = 'general') {
+  const sys = buildSystem(
+    `Generate a detailed structural outline for a ${contentType || 'document'} about the user's topic.`,
+    'Use Markdown formatting with Header levels (H1, H2, H3) and bullet points. ONLY return the markdown.',
+    persona
   );
+  return groqGenerate(sys, `Topic:\n"${topic}"`, onChunk);
 }
 
 // ==================== Translate ====================

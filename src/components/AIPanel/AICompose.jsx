@@ -7,6 +7,7 @@ import {
   FileText, ListChecks, ChevronRight
 } from 'lucide-react';
 import { compose, continueWriting, generateOutline } from '../../services/groq';
+import { useApp } from '../../contexts/AppContext';
 
 const CONTENT_TYPES = [
   { id: 'email', label: '📧 Email' },
@@ -34,6 +35,7 @@ const LANGUAGES = [
 ];
 
 export default function AICompose({ editor, isReady }) {
+  const { checkApiQuota, openPaywall, settings } = useApp();
   const [prompt, setPrompt] = useState('');
   const [contentType, setContentType] = useState('email');
   const [tone, setTone] = useState('');
@@ -47,6 +49,12 @@ export default function AICompose({ editor, isReady }) {
   const handleGenerate = useCallback(async () => {
     if (mode === 'compose' && !prompt.trim()) {
       setError('Please enter a prompt to generate content.');
+      return;
+    }
+
+    const hasQuota = await checkApiQuota();
+    if (!hasQuota) {
+      openPaywall();
       return;
     }
 
@@ -67,14 +75,15 @@ export default function AICompose({ editor, isReady }) {
       } else if (mode === 'outline') {
         await generateOutline(prompt, contentType, onChunk);
       } else {
-        await compose(prompt, contentType, tone, language, onChunk);
+        const persona = settings.activePersona || 'general';
+        await compose(prompt, contentType, tone, language, onChunk, persona);
       }
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [mode, prompt, contentType, tone, language, editor]);
+  }, [mode, prompt, contentType, tone, language, editor, checkApiQuota, openPaywall, settings]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(result);

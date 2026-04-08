@@ -17,6 +17,10 @@ const DEFAULT_SETTINGS = {
   onboardingCompleted: false,
   editorFontSize: 16,
   autoSaveInterval: 2000,
+  isPro: false,
+  apiCalls: 0,
+  lastCallDate: null,
+  activePersona: 'general', // for Phase 7 Personas
 };
 
 // Actions
@@ -33,6 +37,7 @@ const actions = {
   SET_SIDEBAR_OPEN: 'SET_SIDEBAR_OPEN',
   ADD_TOAST: 'ADD_TOAST',
   REMOVE_TOAST: 'REMOVE_TOAST',
+  SET_PAYWALL_OPEN: 'SET_PAYWALL_OPEN',
 };
 
 // Reducer
@@ -71,6 +76,8 @@ function appReducer(state, action) {
       return { ...state, toasts: [...state.toasts, action.payload] };
     case actions.REMOVE_TOAST:
       return { ...state, toasts: state.toasts.filter(t => t.id !== action.payload) };
+    case actions.SET_PAYWALL_OPEN:
+      return { ...state, showPaywall: action.payload };
     default:
       return state;
   }
@@ -84,6 +91,7 @@ const initialState = {
   currentDoc: null,
   sidebarOpen: true,
   toasts: [],
+  showPaywall: false,
 };
 
 // Provider
@@ -197,6 +205,39 @@ export function AppProvider({ children }) {
     return id;
   }, []);
 
+  // Monetization Quota Check
+  const checkApiQuota = useCallback(async () => {
+    if (state.settings.isPro) return true;
+
+    const today = new Date().toISOString().split('T')[0];
+    const { apiCalls, lastCallDate } = state.settings;
+
+    let currentCalls = lastCallDate === today ? (apiCalls || 0) : 0;
+    
+    // Free tier limit: 10 calls/day
+    if (currentCalls >= 10) {
+      return false; // Exceeded
+    }
+
+    // Increment silently
+    await updateSettings({ apiCalls: currentCalls + 1, lastCallDate: today });
+    return true;
+  }, [state.settings, updateSettings]);
+
+  const upgradeToPro = useCallback(async () => {
+    await updateSettings({ isPro: true });
+    dispatch({ type: actions.SET_PAYWALL_OPEN, payload: false });
+    addToast({ type: 'success', message: 'Payment simulated successfully. Welcome to WriteAI Pro!' });
+  }, [updateSettings, addToast]);
+
+  const openPaywall = useCallback(() => {
+    dispatch({ type: actions.SET_PAYWALL_OPEN, payload: true });
+  }, []);
+
+  const closePaywall = useCallback(() => {
+    dispatch({ type: actions.SET_PAYWALL_OPEN, payload: false });
+  }, []);
+
   const value = {
     ...state,
     setUser,
@@ -208,6 +249,10 @@ export function AppProvider({ children }) {
     setCurrentDoc,
     setSidebarOpen,
     addToast,
+    checkApiQuota,
+    upgradeToPro,
+    openPaywall,
+    closePaywall,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -12,6 +12,7 @@ import Editor from './components/Editor/Editor';
 import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import ToastContainer from './components/Toast/ToastContainer';
+import PaywallModal from './components/Paywall/PaywallModal';
 import { checkGroqStatus, getApiKey, setApiKey } from './services/groq';
 import { updateDocument as updateDocInStorage } from './services/storage';
 import './App.css';
@@ -121,8 +122,8 @@ function SettingsModal({ isOpen, onClose, onSave }) {
 // ========================================
 function AppContent() {
   const {
-    user, loading, settings, currentDoc, sidebarOpen,
-    setSidebarOpen, setCurrentDoc, updateDocument, addToast,
+    user, loading, settings, currentDoc, sidebarOpen, showPaywall,
+    setSidebarOpen, setCurrentDoc, updateDocument, addToast, openPaywall, closePaywall,
   } = useApp();
 
   const [groqStatus, setGroqStatus] = useState({ running: false });
@@ -305,6 +306,12 @@ function AppContent() {
         )}
 
         <div className="app-header__actions">
+          {!settings.isPro && (
+            <button className="upgrade-badge-btn" onClick={openPaywall} title="Upgrade to Pro">
+              <Sparkles size={14} /> Upgrade
+            </button>
+          )}
+
           {currentDoc && (
             <div className="export-menu-wrapper" ref={exportMenuRef}>
               <button
@@ -437,6 +444,9 @@ function AppContent() {
         onClose={() => setShowSettings(false)}
         onSave={checkStatus}
       />
+
+      {/* Paywall Modal */}
+      <PaywallModal isOpen={showPaywall} onClose={closePaywall} />
 
       {/* Toast Notifications */}
       <ToastContainer />
