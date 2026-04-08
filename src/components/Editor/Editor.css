@@ -255,9 +255,95 @@
   font-size: var(--font-xs);
   color: var(--text-tertiary);
   transition: background var(--transition-base);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .statusbar-info {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
+
+.statusbar-info span {
+  position: relative;
+}
+
+.statusbar-info span:not(:last-child)::after {
+  content: '·';
+  position: absolute;
+  right: calc(var(--space-3) / -2 - 2px);
+  color: var(--border-color);
+}
+
+.statusbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statusbar-shortcut {
+  color: var(--success);
+  font-weight: 500;
+}
+
+/* ========== Print Styles ========== */
+@media print {
+  .app-header, .sidebar, .ai-panel-wrapper, .editor-toolbar-container,
+  .editor-statusbar, .inline-ai-menu, .toast-container,
+  .mobile-overlay, .settings-overlay, .mobile-ai-toggle {
+    display: none !important;
+  }
+
+  .app {
+    display: block;
+    height: auto;
+  }
+
+  .app-main {
+    display: block;
+  }
+
+  .editor-container {
+    padding: 0;
+  }
+
+  .editor-wrapper {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .editor-content {
+    padding: 0;
+  }
+
+  .editor-content .tiptap {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+  }
+
+  .editor-content .tiptap h1 { font-size: 22pt; }
+  .editor-content .tiptap h2 { font-size: 18pt; }
+  .editor-content .tiptap h3 { font-size: 14pt; }
+
+  .editor-content .tiptap blockquote {
+    border-left-color: #333;
+    background: none;
+  }
+
+  .editor-content .tiptap pre {
+    background: #f5f5f5;
+    border-color: #ddd;
+  }
+
+  .editor-content .tiptap table {
+    page-break-inside: avoid;
+  }
+
+  .editor-content .tiptap img {
+    max-width: 80%;
+    margin: 1em auto;
+  }
+}
+
