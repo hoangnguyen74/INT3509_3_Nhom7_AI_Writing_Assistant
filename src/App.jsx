@@ -388,43 +388,80 @@ function AppContent() {
               onUpdate={handleEditorUpdate}
             />
           ) : (
-            <div className="empty-state dashboard-view">
+            <div className="dashboard-view">
               <div className="dashboard-header">
                 <h1>Welcome back to WriteAI</h1>
-                <p>Your intelligent writing workspace. Start a new document or pick up where you left off.</p>
-              </div>
-              
-              <div className="dashboard-actions">
-                <button className="new-doc-big-btn" onClick={async () => {
-                  const { createDocument } = await import('./services/storage');
-                  const doc = await createDocument('Untitled', '<p></p>');
-                  addDocument(doc);
-                  setCurrentDoc(doc);
-                  addToast({ type: 'success', message: 'New document created' });
-                }}>
-                  <div className="new-doc-icon"><Plus size={24} /></div>
-                  <span>Blank Document</span>
-                </button>
+                <p>Your intelligent writing workspace powered by AI. Start writing, translate, or brainstorm — all in one place.</p>
               </div>
 
-              {documents.length > 0 && (
-                <div className="recent-docs">
-                  <h3>Recent Documents</h3>
-                  <div className="docs-grid">
-                    {documents.slice(0, 4).map(doc => (
-                      <div key={doc.id} className="doc-card" onClick={() => setCurrentDoc(doc)}>
-                        <div className="doc-card-preview">
-                          {doc.content ? doc.content.replace(/<[^>]+>/g, '').substring(0, 100) : 'Empty document...'}
-                        </div>
-                        <div className="doc-card-footer">
-                          <span className="doc-title">{doc.title || 'Untitled Document'}</span>
-                          <span className="doc-date">{new Date(doc.updatedAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    ))}
+              {/* Feature Highlights */}
+              <div className="feature-strip">
+                <div className="feature-card">
+                  <div className="feature-card__icon" style={{background: 'linear-gradient(135deg, #6366f1, #8b5cf6)'}}>🧠</div>
+                  <div className="feature-card__body">
+                    <h4>AI Writing Suite</h4>
+                    <p>Summarize, Fix Grammar, Paraphrase, Expand, Shorten & Readability — 6 tools in one click</p>
                   </div>
                 </div>
-              )}
+                <div className="feature-card">
+                  <div className="feature-card__icon" style={{background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)'}}>🌍</div>
+                  <div className="feature-card__body">
+                    <h4>15-Language Translation</h4>
+                    <p>Translate between English, Vietnamese, Japanese, Chinese, and 11 more languages instantly</p>
+                  </div>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-card__icon" style={{background: 'linear-gradient(135deg, #f59e0b, #ef4444)'}}>🎭</div>
+                  <div className="feature-card__body">
+                    <h4>Expert Personas</h4>
+                    <p>Switch between IT Tech Lead, Marketing Pro, and Academic Researcher AI modes</p>
+                  </div>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-card__icon" style={{background: 'linear-gradient(135deg, #10b981, #059669)'}}>📄</div>
+                  <div className="feature-card__body">
+                    <h4>Multi-Format Export</h4>
+                    <p>Export to Markdown, HTML, Plain Text, and PDF with one click</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Documents Grid */}
+              <div className="recent-docs">
+                <div className="recent-docs__header">
+                  <h3>Documents</h3>
+                  {documents.length > 8 && (
+                    <button className="view-all-btn" onClick={() => setSidebarOpen(true)}>
+                      View all ({documents.length}) →
+                    </button>
+                  )}
+                </div>
+                <div className="docs-grid">
+                  {/* New Document Card */}
+                  <div className="doc-card doc-card--new" onClick={async () => {
+                    const { createDocument } = await import('./services/storage');
+                    const doc = await createDocument('Untitled', '<p></p>');
+                    addDocument(doc);
+                    setCurrentDoc(doc);
+                    addToast({ type: 'success', message: 'New document created' });
+                  }}>
+                    <div className="doc-card-new-icon"><Plus size={28} /></div>
+                    <span>New Document</span>
+                  </div>
+                  {/* Existing Documents */}
+                  {documents.slice(0, 8).map(doc => (
+                    <div key={doc.id} className="doc-card" onClick={() => setCurrentDoc(doc)}>
+                      <div className="doc-card-preview">
+                        {doc.content ? doc.content.replace(/<[^>]+>/g, '').substring(0, 80) : 'Empty document...'}
+                      </div>
+                      <div className="doc-card-footer">
+                        <span className="doc-title">{doc.title || 'Untitled'}</span>
+                        <span className="doc-date">{new Date(doc.updatedAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

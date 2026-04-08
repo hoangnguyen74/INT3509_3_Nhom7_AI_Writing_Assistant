@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Sparkles, Check, X, Shield, Zap } from 'lucide-react';
+import { Sparkles, Check, X, Zap } from 'lucide-react';
 import './PaywallModal.css';
 import { useApp } from '../../contexts/AppContext';
 
 export default function PaywallModal({ isOpen, onClose }) {
   const { upgradeToPro } = useApp();
-  const [billing, setBilling] = useState('yearly'); // 'monthly' | 'yearly'
+  const [billing, setBilling] = useState('yearly');
 
   if (!isOpen) return null;
 
@@ -26,17 +26,20 @@ export default function PaywallModal({ isOpen, onClose }) {
            <h2>Upgrade to WriteAI Pro</h2>
            <p>Deliver impactful writing, whether working alone or as a team. Unleash unlimited AI power.</p>
            
-           <div className="billing-toggle">
-              <span className={billing === 'monthly' ? 'active' : ''}>Monthly</span>
-              <button 
-                className={`toggle-track ${billing === 'yearly' ? 'yearly' : ''}`}
-                onClick={() => setBilling(billing === 'monthly' ? 'yearly' : 'monthly')}
-              >
-                 <div className="toggle-thumb" />
-              </button>
-              <span className={billing === 'yearly' ? 'active' : ''}>
-                Yearly <span className="discount">Save 60%</span>
-              </span>
+           {/* Segmented Control */}
+           <div className="billing-tabs">
+             <button 
+               className={`billing-tab ${billing === 'monthly' ? 'billing-tab--active' : ''}`}
+               onClick={() => setBilling('monthly')}
+             >
+               Monthly
+             </button>
+             <button 
+               className={`billing-tab ${billing === 'yearly' ? 'billing-tab--active' : ''}`}
+               onClick={() => setBilling('yearly')}
+             >
+               Yearly <span className="discount">Save 60%</span>
+             </button>
            </div>
         </div>
 
@@ -70,7 +73,9 @@ export default function PaywallModal({ isOpen, onClose }) {
                  <span className="period">/ month</span>
               </div>
               <p className="billing-hint">{billing === 'yearly' ? 'Billed $144 annually' : 'Billed monthly'}</p>
-              <button className="pricing-btn primary" onClick={handleUpgrade}>Upgrade to Pro</button>
+              <button className="pricing-btn primary-gradient" onClick={handleUpgrade}>
+                <Sparkles size={16} /> Upgrade to Pro
+              </button>
               <ul className="features-list">
                  <li><Check size={16} className="text-primary"/> <b>Everything in Free</b></li>
                  <li><Check size={16} className="text-primary"/> <b>Unlimited AI usage</b></li>
