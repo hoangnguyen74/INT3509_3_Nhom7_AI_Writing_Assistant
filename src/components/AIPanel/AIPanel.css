@@ -424,6 +424,11 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  margin-top: 8px;
+}
+
+.translate-lang-field .compose-label {
+  margin-top: 0;
 }
 
 .compose-textarea {
