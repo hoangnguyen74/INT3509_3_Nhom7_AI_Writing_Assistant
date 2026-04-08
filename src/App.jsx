@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { PenLine, Sparkles, Menu, X, Eye, EyeOff, Key } from 'lucide-react';
+import {
+  PenLine, Sparkles, Menu, X, Eye, EyeOff, Key, Download, FileText,
+  FileCode, FileType, Printer, Wand2, Languages, MessageSquare, BookOpen,
+} from 'lucide-react';
+import { exportAsMarkdown, exportAsPlainText, exportAsHTML, exportAsPDF } from './services/export';
 import { AppProvider, useApp } from './contexts/AppContext';
 import AuthPage from './pages/AuthPage';
 import OnboardingFlow from './components/Onboarding/OnboardingFlow';
@@ -7,6 +11,7 @@ import Sidebar from './components/Sidebar/Sidebar';
 import Editor from './components/Editor/Editor';
 import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
+import ToastContainer from './components/Toast/ToastContainer';
 import { checkGroqStatus, getApiKey, setApiKey } from './services/groq';
 import { updateDocument as updateDocInStorage } from './services/storage';
 import './App.css';
@@ -124,7 +129,10 @@ function AppContent() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exportingPDF, setExportingPDF] = useState(false);
   const editorRef = useRef(null);
+  const exportMenuRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
 
   // Check Groq status
@@ -178,10 +186,71 @@ function AppContent() {
     editorRef.current = editor;
   }, []);
 
+  // Close export menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleExport = async (format) => {
+    if (!currentDoc) return;
+    setShowExportMenu(false);
+    if (format === 'pdf') {
+      setExportingPDF(true);
+      try {
+        await exportAsPDF(currentDoc);
+        addToast({ type: 'success', message: 'PDF exported successfully!' });
+      } catch (err) {
+        console.error('PDF export error:', err);
+        addToast({ type: 'error', message: 'PDF export failed' });
+      } finally {
+        setExportingPDF(false);
+      }
+    } else if (format === 'md') {
+      exportAsMarkdown(currentDoc);
+      addToast({ type: 'success', message: 'Markdown exported!' });
+    } else if (format === 'txt') {
+      exportAsPlainText(currentDoc);
+      addToast({ type: 'success', message: 'Text file exported!' });
+    } else if (format === 'html') {
+      exportAsHTML(currentDoc);
+      addToast({ type: 'success', message: 'HTML exported!' });
+    }
+  };
+
   const handleOnboardingComplete = useCallback(() => {
     setShowOnboarding(false);
     checkStatus();
   }, [checkStatus]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl+S — Force save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (currentDoc && editorRef.current) {
+          const content = editorRef.current.getHTML();
+          updateDocInStorage(currentDoc.id, { content }).then((updated) => {
+            updateDocument(updated);
+            addToast({ type: 'success', message: 'Document saved!' });
+          });
+        }
+      }
+      // Ctrl+Shift+E — Export menu
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
+        e.preventDefault();
+        if (currentDoc) setShowExportMenu((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentDoc, updateDocument, addToast]);
 
   // Loading state
   if (loading) {
@@ -236,6 +305,56 @@ function AppContent() {
         )}
 
         <div className="app-header__actions">
+          {currentDoc && (
+            <div className="export-menu-wrapper" ref={exportMenuRef}>
+              <button
+                className={`header-action-btn ${showExportMenu ? 'active' : ''}`}
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                title="Export document"
+                disabled={exportingPDF}
+              >
+                {exportingPDF ? (
+                  <div className="btn-spinner" />
+                ) : (
+                  <Download size={18} />
+                )}
+              </button>
+              {showExportMenu && (
+                <div className="export-dropdown fade-in">
+                  <div className="export-dropdown__header">Export as...</div>
+                  <button onClick={() => handleExport('md')}>
+                    <FileText size={15} />
+                    <div>
+                      <span>Markdown</span>
+                      <small>.md</small>
+                    </div>
+                  </button>
+                  <button onClick={() => handleExport('txt')}>
+                    <FileType size={15} />
+                    <div>
+                      <span>Plain Text</span>
+                      <small>.txt</small>
+                    </div>
+                  </button>
+                  <button onClick={() => handleExport('html')}>
+                    <FileCode size={15} />
+                    <div>
+                      <span>HTML</span>
+                      <small>.html</small>
+                    </div>
+                  </button>
+                  <div className="export-dropdown__divider" />
+                  <button onClick={() => handleExport('pdf')}>
+                    <Printer size={15} />
+                    <div>
+                      <span>PDF</span>
+                      <small>.pdf</small>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <ThemeToggle />
           <button
             className="mobile-ai-toggle"
@@ -266,8 +385,30 @@ function AppContent() {
               <div className="editor-empty__icon">
                 <PenLine size={48} />
               </div>
-              <h2>Select or create a document</h2>
-              <p>Choose a document from the sidebar, or create a new one to get started.</p>
+              <h2>Welcome to WriteAI</h2>
+              <p>Select a document from the sidebar, or create a new one to start writing with AI.</p>
+              <div className="editor-empty__features">
+                <div className="editor-empty__feature">
+                  <Wand2 size={18} />
+                  <span>AI Writing Tools</span>
+                </div>
+                <div className="editor-empty__feature">
+                  <Languages size={18} />
+                  <span>Translation</span>
+                </div>
+                <div className="editor-empty__feature">
+                  <MessageSquare size={18} />
+                  <span>AI Chat</span>
+                </div>
+                <div className="editor-empty__feature">
+                  <BookOpen size={18} />
+                  <span>Rich Editor</span>
+                </div>
+              </div>
+              <div className="editor-empty__shortcuts">
+                <kbd>Ctrl+S</kbd> Save &nbsp;·&nbsp;
+                <kbd>Ctrl+Shift+E</kbd> Export
+              </div>
             </div>
           )}
         </div>
@@ -297,7 +438,8 @@ function AppContent() {
         onSave={checkStatus}
       />
 
-      {/* Toast Notifications (simple version for now) */}
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

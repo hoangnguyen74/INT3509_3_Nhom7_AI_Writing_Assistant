@@ -63,10 +63,15 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
     onEditorReady(editor);
   }
 
-  const wordCount = editor
-    ? editor.state.doc.textContent.split(/\s+/).filter(Boolean).length
+  const textContent = editor ? editor.state.doc.textContent : '';
+  const wordCount = textContent.split(/\s+/).filter(Boolean).length;
+  const charCount = textContent.length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+  const paragraphCount = editor
+    ? editor.state.doc.content.content.filter(
+        (node) => node.type.name === 'paragraph' && node.textContent.trim().length > 0
+      ).length
     : 0;
-  const charCount = editor ? editor.state.doc.textContent.length : 0;
 
   return (
     <div className="editor-wrapper">
@@ -79,9 +84,15 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
         <div className="statusbar-info">
           <span>{wordCount} words</span>
           <span>{charCount} characters</span>
+          <span>{paragraphCount} paragraphs</span>
+          <span>~{readingTime} min read</span>
         </div>
-        <span>WriteAI Editor</span>
+        <div className="statusbar-right">
+          <span className="statusbar-shortcut" title="Auto-save is enabled">Auto-save ✓</span>
+          <span>WriteAI</span>
+        </div>
       </div>
     </div>
   );
 }
+
