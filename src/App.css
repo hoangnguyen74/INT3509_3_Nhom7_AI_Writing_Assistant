@@ -1119,3 +1119,103 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
+
+/* ========== Loading Skeleton ========== */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.skeleton-card__thumb {
+  height: 100px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-hover) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-card__body {
+  padding: var(--space-3);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-hover) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-line--short { width: 60%; }
+.skeleton-line--xs { width: 40%; height: 10px; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ========== Print Support ========== */
+@media print {
+  /* Hide everything except editor content */
+  .app-header,
+  .sidebar,
+  .ai-panel,
+  .editor-toolbar-wrapper,
+  .editor-statusbar,
+  .mobile-ai-toggle,
+  .toast-container,
+  .settings-overlay,
+  .paywall-overlay,
+  .upgrade-badge-btn,
+  .quota-badge,
+  .export-menu-wrapper {
+    display: none !important;
+  }
+
+  .app {
+    display: block !important;
+  }
+
+  .app-main {
+    display: block !important;
+  }
+
+  .editor-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .editor-layout {
+    display: block !important;
+  }
+
+  .editor-content-wrapper {
+    padding: 0 !important;
+  }
+
+  .editor-content {
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+    color: #000 !important;
+  }
+
+  .ProseMirror {
+    padding: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+  }
+}

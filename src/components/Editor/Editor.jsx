@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -18,6 +18,7 @@ import Toolbar from './Toolbar';
 import AIToolbar from './AIToolbar';
 import DiffSuggestion from './DiffSuggestion';
 import InlineAIMenu from './InlineAIMenu';
+import FindReplace from './FindReplace';
 import './Editor.css';
 
 export default function Editor({ initialContent, onEditorReady, onUpdate }) {
@@ -28,6 +29,23 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
   const [aiResult, setAiResult] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [showFind, setShowFind] = useState(false);
+
+  // Ctrl+F / Ctrl+H keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        setShowFind(true);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+        e.preventDefault();
+        setShowFind(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -118,6 +136,7 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
       </div>
 
       <div className="editor-content-wrapper">
+        <FindReplace editor={editor} isOpen={showFind} onClose={() => setShowFind(false)} />
         <InlineAIMenu editor={editor} />
         <EditorContent editor={editor} className="editor-content" />
         

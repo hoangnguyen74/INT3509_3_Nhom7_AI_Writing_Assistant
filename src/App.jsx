@@ -13,6 +13,7 @@ import AIPanel from './components/AIPanel/AIPanel';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import ToastContainer from './components/Toast/ToastContainer';
 import PaywallModal from './components/Paywall/PaywallModal';
+import TemplateGallery from './components/TemplateGallery/TemplateGallery';
 import { checkGroqStatus, getApiKey, setApiKey } from './services/groq';
 import { updateDocument as updateDocInStorage } from './services/storage';
 import './App.css';
@@ -134,6 +135,7 @@ function AppContent() {
   const [exportingPDF, setExportingPDF] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
+  const [showTemplates, setShowTemplates] = useState(false);
   const editorRef = useRef(null);
   const exportMenuRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
@@ -249,6 +251,11 @@ function AppContent() {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
         e.preventDefault();
         if (currentDoc) setShowExportMenu((prev) => !prev);
+      }
+      // Ctrl+P — Print
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        if (currentDoc) window.print();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -473,13 +480,7 @@ function AppContent() {
                 </div>
                 <div className="docs-grid">
                   {/* New Document Card */}
-                  <div className="doc-card doc-card--new" onClick={async () => {
-                    const { createDocument } = await import('./services/storage');
-                    const doc = await createDocument('Untitled', '<p></p>');
-                    addDocument(doc);
-                    setCurrentDoc(doc);
-                    addToast({ type: 'success', message: 'New document created' });
-                  }}>
+                  <div className="doc-card doc-card--new" onClick={() => setShowTemplates(true)}>
                     <div className="doc-card-new-icon"><Plus size={28} /></div>
                     <span>New Document</span>
                   </div>
@@ -530,6 +531,19 @@ function AppContent() {
 
       {/* Paywall Modal */}
       <PaywallModal isOpen={showPaywall} onClose={closePaywall} />
+
+      {/* Template Gallery */}
+      <TemplateGallery
+        isOpen={showTemplates}
+        onClose={() => setShowTemplates(false)}
+        onSelect={async (title, content) => {
+          const { createDocument } = await import('./services/storage');
+          const doc = await createDocument(title, content);
+          addDocument(doc);
+          setCurrentDoc(doc);
+          addToast({ type: 'success', message: `Created from template: ${title}` });
+        }}
+      />
 
       {/* Toast Notifications */}
       <ToastContainer />
