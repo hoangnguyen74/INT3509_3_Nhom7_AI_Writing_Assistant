@@ -132,6 +132,8 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState('');
   const editorRef = useRef(null);
   const exportMenuRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
@@ -298,18 +300,51 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Document title */}
+        {/* Document title — editable */}
         {currentDoc && (
-          <div className="app-header__doc-title">
-            {currentDoc.title || 'Untitled'}
-          </div>
+          editingTitle ? (
+            <input
+              className="app-header__doc-title-input"
+              value={titleDraft}
+              onChange={e => setTitleDraft(e.target.value)}
+              onBlur={async () => {
+                const newTitle = titleDraft.trim() || 'Untitled';
+                const updated = await updateDocInStorage(currentDoc.id, { title: newTitle });
+                updateDocument(updated);
+                setCurrentDoc({ ...currentDoc, title: newTitle });
+                setEditingTitle(false);
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') e.target.blur();
+                if (e.key === 'Escape') setEditingTitle(false);
+              }}
+              autoFocus
+              maxLength={80}
+            />
+          ) : (
+            <div
+              className="app-header__doc-title"
+              onClick={() => {
+                setTitleDraft(currentDoc.title || 'Untitled');
+                setEditingTitle(true);
+              }}
+              title="Click to rename"
+            >
+              {currentDoc.title || 'Untitled'}
+            </div>
+          )
         )}
 
         <div className="app-header__actions">
           {!settings.isPro && (
-            <button className="upgrade-badge-btn" onClick={openPaywall} title="Upgrade to Pro">
-              <Sparkles size={14} /> Upgrade
-            </button>
+            <>
+              <span className="quota-badge" title="AI calls used today">
+                {settings.lastCallDate === new Date().toISOString().split('T')[0] ? (settings.apiCalls || 0) : 0}/10
+              </span>
+              <button className="upgrade-badge-btn" onClick={openPaywall} title="Upgrade to Pro">
+                <Sparkles size={14} /> Upgrade
+              </button>
+            </>
           )}
 
           {currentDoc && (
