@@ -21,7 +21,7 @@ export default function PaywallModal({ isOpen, onClose }) {
         
         <div className="paywall-header">
            <div className="paywall-icon-wrapper">
-             <Zap size={24} className="paywall-icon" />
+             <span className="paywall-icon">⚡</span>
            </div>
            <h2>Upgrade to WriteAI Pro</h2>
            <p>Deliver impactful writing, whether working alone or as a team. Unleash unlimited AI power.</p>

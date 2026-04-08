@@ -250,7 +250,7 @@ export default function OnboardingFlow({ onComplete }) {
               </div>
 
               <div className="onboarding__tip">
-                <strong>💡 Pro tip:</strong> Use <kbd>Ctrl+K</kbd> to open the Command Palette — search and access any feature instantly!
+                <strong>💡 Pro tip:</strong> Use <kbd>Ctrl+F</kbd> to open Find &amp; Replace — search and update text across your document instantly!
               </div>
             </div>
           )}
