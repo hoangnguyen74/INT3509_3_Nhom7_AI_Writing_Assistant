@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   PenLine, Sparkles, Menu, X, Eye, EyeOff, Key, Download, FileText,
-  FileCode, FileType, Printer, Wand2, Languages, MessageSquare, BookOpen,
+  FileCode, FileType, Printer, Plus,
 } from 'lucide-react';
 import { exportAsMarkdown, exportAsPlainText, exportAsHTML, exportAsPDF } from './services/export';
 import { AppProvider, useApp } from './contexts/AppContext';
@@ -122,8 +122,8 @@ function SettingsModal({ isOpen, onClose, onSave }) {
 // ========================================
 function AppContent() {
   const {
-    user, loading, settings, currentDoc, sidebarOpen, showPaywall,
-    setSidebarOpen, setCurrentDoc, updateDocument, addToast, openPaywall, closePaywall,
+    user, loading, settings, currentDoc, sidebarOpen, showPaywall, documents,
+    setSidebarOpen, setCurrentDoc, addDocument, updateDocument, addToast, openPaywall, closePaywall,
   } = useApp();
 
   const [groqStatus, setGroqStatus] = useState({ running: false });
@@ -388,46 +388,57 @@ function AppContent() {
               onUpdate={handleEditorUpdate}
             />
           ) : (
-            <div className="editor-empty">
-              <div className="editor-empty__icon">
-                <PenLine size={48} />
+            <div className="empty-state dashboard-view">
+              <div className="dashboard-header">
+                <h1>Welcome back to WriteAI</h1>
+                <p>Your intelligent writing workspace. Start a new document or pick up where you left off.</p>
               </div>
-              <h2>Welcome to WriteAI</h2>
-              <p>Select a document from the sidebar, or create a new one to start writing with AI.</p>
-              <div className="editor-empty__features">
-                <div className="editor-empty__feature">
-                  <Wand2 size={18} />
-                  <span>AI Writing Tools</span>
-                </div>
-                <div className="editor-empty__feature">
-                  <Languages size={18} />
-                  <span>Translation</span>
-                </div>
-                <div className="editor-empty__feature">
-                  <MessageSquare size={18} />
-                  <span>AI Chat</span>
-                </div>
-                <div className="editor-empty__feature">
-                  <BookOpen size={18} />
-                  <span>Rich Editor</span>
-                </div>
+              
+              <div className="dashboard-actions">
+                <button className="new-doc-big-btn" onClick={async () => {
+                  const { createDocument } = await import('./services/storage');
+                  const doc = await createDocument('Untitled', '<p></p>');
+                  addDocument(doc);
+                  setCurrentDoc(doc);
+                  addToast({ type: 'success', message: 'New document created' });
+                }}>
+                  <div className="new-doc-icon"><Plus size={24} /></div>
+                  <span>Blank Document</span>
+                </button>
               </div>
-              <div className="editor-empty__shortcuts">
-                <kbd>Ctrl+S</kbd> Save &nbsp;·&nbsp;
-                <kbd>Ctrl+Shift+E</kbd> Export
-              </div>
+
+              {documents.length > 0 && (
+                <div className="recent-docs">
+                  <h3>Recent Documents</h3>
+                  <div className="docs-grid">
+                    {documents.slice(0, 4).map(doc => (
+                      <div key={doc.id} className="doc-card" onClick={() => setCurrentDoc(doc)}>
+                        <div className="doc-card-preview">
+                          {doc.content ? doc.content.replace(/<[^>]+>/g, '').substring(0, 100) : 'Empty document...'}
+                        </div>
+                        <div className="doc-card-footer">
+                          <span className="doc-title">{doc.title || 'Untitled Document'}</span>
+                          <span className="doc-date">{new Date(doc.updatedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* AI Panel */}
-        <div className={`ai-panel-wrapper ${showAIPanel ? 'ai-panel-wrapper--mobile-open' : ''}`}>
-          <AIPanel
-            editor={editorRef.current}
-            groqStatus={groqStatus}
-            onOpenSettings={() => setShowSettings(true)}
-          />
-        </div>
+        {/* AI Panel - only show when a document is open */}
+        {currentDoc && (
+          <div className={`ai-panel-wrapper ${showAIPanel ? 'ai-panel-wrapper--mobile-open' : ''}`}>
+            <AIPanel
+              editor={editorRef.current}
+              groqStatus={groqStatus}
+              onOpenSettings={() => setShowSettings(true)}
+            />
+          </div>
+        )}
 
         {/* Mobile overlay */}
         {showAIPanel && (

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -64,15 +65,21 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
     content: initialContent || '<p></p>',
     onUpdate: ({ editor }) => {
       onUpdate?.(editor.getHTML());
-      const stats = {
-        words: editor.storage.characterCount.words(),
-        characters: editor.storage.characterCount.characters(),
-        paragraphs: editor.state.doc.content.content.filter(
+      
+      try {
+        const words = editor?.storage?.characterCount?.words?.() || 0;
+        const characters = editor?.storage?.characterCount?.characters?.() || 0;
+        const docNodes = editor?.state?.doc?.content?.content || [];
+        const paragraphs = docNodes.filter(
           (node) => node.type.name === 'paragraph' && node.textContent.trim().length > 0
-        ).length
-      };
-      setWordCount(stats);
-      setReadingTime(Math.max(1, Math.ceil(stats.words / 200)));
+        ).length;
+        
+        const stats = { words, characters, paragraphs };
+        setWordCount(stats);
+        setReadingTime(Math.max(1, Math.ceil(stats.words / 200)));
+      } catch (err) {
+        console.error('Word count stats error:', err);
+      }
     },
     onCreate: ({ editor }) => {
       onEditorReady?.(editor);
