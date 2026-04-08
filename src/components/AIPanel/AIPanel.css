@@ -4,8 +4,8 @@
    ======================================== */
 
 .ai-panel {
-  width: 380px;
-  min-width: 380px;
+  width: 360px;
+  min-width: 360px;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary);
@@ -142,10 +142,10 @@
 .ai-panel__content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-3);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 .ai-panel__no-key {
@@ -415,7 +415,7 @@
 .compose-field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .compose-label {
@@ -452,7 +452,7 @@
 
 .compose-type-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
@@ -551,14 +551,14 @@
 .translate-langs {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .translate-lang-field {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .translate-swap-btn {
