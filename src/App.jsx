@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   PenLine, Sparkles, Menu, X, Eye, EyeOff, Key, Download, FileText,
-  FileCode, FileType, Printer, Plus,
+  FileCode, FileType, Printer, Plus, Home
 } from 'lucide-react';
 import { exportAsMarkdown, exportAsPlainText, exportAsHTML, exportAsPDF } from './services/export';
 import { AppProvider, useApp } from './contexts/AppContext';
@@ -124,7 +124,7 @@ function SettingsModal({ isOpen, onClose, onSave }) {
 function AppContent() {
   const {
     user, loading, settings, currentDoc, sidebarOpen, showPaywall, documents,
-    setSidebarOpen, setCurrentDoc, addDocument, updateDocument, addToast, openPaywall, closePaywall,
+    setSidebarOpen, setCurrentDoc, addDocument, updateDocument, addToast, openPaywall, closePaywall, updateSettings,
   } = useApp();
 
   const [groqStatus, setGroqStatus] = useState({ running: false });
@@ -154,10 +154,10 @@ function AppContent() {
 
   // Check if onboarding needed
   useEffect(() => {
-    if (user && !settings.onboardingCompleted) {
+    if (user && !loading && !settings.onboardingCompleted) {
       setShowOnboarding(true);
     }
-  }, [user, settings.onboardingCompleted]);
+  }, [user, loading, settings.onboardingCompleted]);
 
   // Auto-save
   const handleEditorUpdate = useCallback((content) => {
@@ -297,7 +297,7 @@ function AppContent() {
               <Menu size={18} />
             </button>
           )}
-          <div className="app-logo">
+          <div className="app-logo" onClick={() => setCurrentDoc(null)} style={{cursor: 'pointer'}} title="Go to Dashboard">
             <div className="app-logo__icon">
               <PenLine />
             </div>
@@ -305,6 +305,16 @@ function AppContent() {
               Write<span>AI</span>
             </h1>
           </div>
+          {currentDoc && (
+            <button 
+              className="header-action-btn" 
+              onClick={() => setCurrentDoc(null)}
+              style={{ marginLeft: 16 }}
+              title="Home (Dashboard)"
+            >
+              <Home size={18} />
+            </button>
+          )}
         </div>
 
         {/* Document title — editable */}
@@ -343,7 +353,7 @@ function AppContent() {
         )}
 
         <div className="app-header__actions">
-          {!settings.isPro && (
+          {!settings.isPro ? (
             <>
               <span className="quota-badge" title="AI calls used today">
                 {settings.lastCallDate === new Date().toISOString().split('T')[0] ? (settings.apiCalls || 0) : 0}/10
@@ -352,6 +362,18 @@ function AppContent() {
                 <Sparkles size={14} /> Upgrade
               </button>
             </>
+          ) : (
+            <button 
+              className="upgrade-badge-btn upgrade-badge-btn--pro" 
+              onClick={() => {
+                updateSettings({ isPro: false });
+                addToast({ message: 'Downgraded to free (Demo)', type: 'info' })
+              }}
+              title="Click to downgrade (Demo purpose)"
+              style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+            >
+              <Sparkles size={14} /> Pro
+            </button>
           )}
 
           {currentDoc && (
@@ -418,7 +440,11 @@ function AppContent() {
       {/* Main Content */}
       <main className="app-main">
         {/* Sidebar */}
-        <Sidebar />
+        <Sidebar onNewDocument={() => {
+          setShowTemplates(true);
+          // Optional: hide sidebar on mobile when opening templates
+          if (window.innerWidth <= 768) setSidebarOpen(false);
+        }} />
 
         {/* Editor Area */}
         <div className="editor-container">

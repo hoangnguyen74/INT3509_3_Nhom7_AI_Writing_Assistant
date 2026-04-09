@@ -36,7 +36,7 @@ function truncate(str, len = 60) {
   return str.length > len ? str.substring(0, len) + '...' : str;
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onNewDocument }) {
   const {
     user, documents, currentDoc, sidebarOpen,
     setDocuments, setCurrentDoc, setSidebarOpen,
@@ -92,6 +92,11 @@ export default function Sidebar() {
 
   // Create new document
   const handleNewDoc = async () => {
+    if (onNewDocument) {
+      onNewDocument();
+      return;
+    }
+    
     try {
       const doc = await createDocument('Untitled', '<p></p>');
       addDocument(doc);

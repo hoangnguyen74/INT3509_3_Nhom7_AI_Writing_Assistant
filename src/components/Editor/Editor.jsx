@@ -66,6 +66,9 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
       }),
       Table.configure({
         resizable: true,
+        handleWidth: 5,
+        cellMinWidth: 50,
+        lastColumnResizable: true,
       }),
       TableRow,
       TableHeader,
@@ -81,6 +84,31 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
       CharacterCount,
     ],
     content: initialContent || '<p></p>',
+    editorProps: {
+      handleKeyDown: (view, event) => {
+        // Tab key handling — prevent focus from leaving editor
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          const { editor: ed } = view.state;
+          // In a table: navigate to next/prev cell
+          if (view.state.selection.$from.parent.type.name === 'tableCell' ||
+              view.state.selection.$from.parent.type.name === 'tableHeader') {
+            if (event.shiftKey) {
+              // Try goToPreviousCell
+              return false; // let tiptap table handle it
+            }
+            return false; // let tiptap table handle it
+          }
+          // In a list: indent/outdent
+          // Otherwise: insert tab space
+          const { state, dispatch } = view;
+          const tr = state.tr.insertText('\t');
+          dispatch(tr);
+          return true;
+        }
+        return false;
+      },
+    },
     onUpdate: ({ editor }) => {
       onUpdate?.(editor.getHTML());
       

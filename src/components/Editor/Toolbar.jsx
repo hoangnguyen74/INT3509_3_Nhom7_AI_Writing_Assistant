@@ -5,27 +5,42 @@ import {
   Image as ImageIcon, Link as LinkIcon, CheckSquare, Code,
   Table as TableIcon, Columns, Rows, Trash2, Unlink
 } from 'lucide-react';
+import LinkDialog from './LinkDialog';
 import './Toolbar.css'; // Let's add a specific css file for Toolbar if needed or use Editor.css
 
 export default function Toolbar({ editor }) {
   const fileInputRef = useRef(null);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
 
   if (!editor) return null;
 
-  const setLink = useCallback(() => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
+  const openLinkDialog = useCallback(() => {
+    setShowLinkDialog(true);
+  }, []);
 
-    if (url === null) {
-      return;
+  const handleLinkSubmit = useCallback(({ url, text }) => {
+    if (!editor) return;
+    
+    const { from, to } = editor.state.selection;
+    const hasSelection = from !== to;
+    
+    if (text && !hasSelection) {
+      // No selection + display text: insert text with link
+      editor.chain().focus()
+        .insertContent(`<a href="${url}">${text}</a>`)
+        .run();
+    } else if (hasSelection) {
+      // Has selection: wrap it in a link
+      editor.chain().focus()
+        .extendMarkRange('link')
+        .setLink({ href: url })
+        .run();
+    } else {
+      // No selection, no text: insert URL as both text and link
+      editor.chain().focus()
+        .insertContent(`<a href="${url}">${url}</a>`)
+        .run();
     }
-
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }, [editor]);
 
   const handleImageUpload = (e) => {
@@ -60,7 +75,7 @@ export default function Toolbar({ editor }) {
         { icon: <Italic />, action: () => editor.chain().focus().toggleItalic().run(), active: editor.isActive('italic'), title: 'Italic' },
         { icon: <UnderlineIcon />, action: () => editor.chain().focus().toggleUnderline().run(), active: editor.isActive('underline'), title: 'Underline' },
         { icon: <Highlighter />, action: () => editor.chain().focus().toggleHighlight().run(), active: editor.isActive('highlight'), title: 'Highlight' },
-        { icon: <LinkIcon />, action: setLink, active: editor.isActive('link'), title: 'Link' },
+        { icon: <LinkIcon />, action: openLinkDialog, active: editor.isActive('link'), title: 'Link' },
         { icon: <Unlink />, action: () => editor.chain().focus().unsetLink().run(), active: false, title: 'Unlink', visible: editor.isActive('link') },
       ]
     },
@@ -159,6 +174,15 @@ export default function Toolbar({ editor }) {
         onChange={handleImageUpload}
         accept="image/*"
         style={{ display: 'none' }}
+      />
+
+      {/* Link Dialog */}
+      <LinkDialog
+        isOpen={showLinkDialog}
+        onClose={() => setShowLinkDialog(false)}
+        onSubmit={handleLinkSubmit}
+        initialUrl={editor.isActive('link') ? editor.getAttributes('link').href : ''}
+        initialText=""
       />
     </div>
   );

@@ -249,26 +249,61 @@ export function exportAsHTML(doc) {
 export async function exportAsPDF(doc) {
   const html2pdf = (await import('html2pdf.js')).default;
 
-  // Create a temporary container with styled content
-  const container = document.createElement('div');
-  container.innerHTML = wrapInHtmlTemplate(doc.content || '', doc.title);
-
-  // Extract body only (html2pdf renders from element)
-  const body = container.querySelector('body');
+  // Build a fully styled wrapper with embedded styles
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = `
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.8;
-    color: #1e293b;
-    padding: 20px;
+  wrapper.innerHTML = `
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body, div, p, h1, h2, h3, ul, ol, li, table, td, th, blockquote {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #1e293b;
+      }
+      h1 { font-size: 1.8em; font-weight: 700; margin: 0.6em 0 0.3em; }
+      h2 { font-size: 1.4em; font-weight: 600; margin: 0.5em 0 0.25em; }
+      h3 { font-size: 1.15em; font-weight: 600; margin: 0.4em 0 0.2em; }
+      p { margin: 0.4em 0; line-height: 1.7; font-size: 14px; }
+      a { color: #3b82f6; text-decoration: underline; }
+      strong { font-weight: 600; }
+      blockquote {
+        border-left: 3px solid #3b82f6;
+        padding: 0.4em 0.8em;
+        margin: 0.6em 0;
+        color: #64748b;
+        font-style: italic;
+        background: #f0f5ff;
+        border-radius: 0 6px 6px 0;
+      }
+      pre {
+        background: #f1f5f9;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        overflow-x: auto;
+        margin: 0.8em 0;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+      }
+      code { font-family: Consolas, monospace; font-size: 0.9em; }
+      ul, ol { padding-left: 1.5em; margin: 0.4em 0; }
+      li { margin: 0.15em 0; line-height: 1.6; font-size: 14px; }
+      img { max-width: 100%; border-radius: 6px; margin: 0.8em 0; }
+      table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
+      th, td { border: 1px solid #e2e8f0; padding: 6px 10px; text-align: left; font-size: 13px; }
+      th { background: #f8fafc; font-weight: 600; }
+      mark { background: rgba(59,130,246,0.2); border-radius: 2px; padding: 0 2px; }
+    </style>
+    <div style="padding: 0; line-height: 1.7; font-size: 14px;">
+      <h1 style="margin-bottom: 16px;">${doc.title || 'Untitled'}</h1>
+      ${doc.content || ''}
+    </div>
   `;
-  wrapper.innerHTML = body ? body.innerHTML : container.innerHTML;
 
-  // Temporarily add to DOM (needed by html2pdf)
+  // Temporarily add to DOM (required by html2pdf)
   wrapper.style.position = 'fixed';
   wrapper.style.left = '-9999px';
   wrapper.style.top = '0';
   wrapper.style.width = '700px';
+  wrapper.style.background = 'white';
   document.body.appendChild(wrapper);
 
   const filename = sanitize(doc.title) + '.pdf';
@@ -276,10 +311,15 @@ export async function exportAsPDF(doc) {
   try {
     await html2pdf()
       .set({
-        margin: [15, 15, 15, 15],
+        margin: [12, 12, 12, 12],
         filename,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true },
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          letterRendering: true,
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       })
       .from(wrapper)
@@ -288,3 +328,4 @@ export async function exportAsPDF(doc) {
     document.body.removeChild(wrapper);
   }
 }
+
