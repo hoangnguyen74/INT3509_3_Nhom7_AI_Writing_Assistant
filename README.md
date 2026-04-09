@@ -1,76 +1,76 @@
 # ✍️ WriteAI
 
-**WriteAI** is an intelligent, modern, and feature-rich writing workspace powered by Artificial Intelligence. It combines the flexibility of a rich text editor with the sheer power of advanced LLMs (Groq / LLaMA-3), designed to help you write better, faster, and smarter.
+**WriteAI** là một không gian làm việc thông minh, hiện đại và giàu tính năng được sức mạnh của Trí tuệ Nhân tạo (AI) hậu thuẫn. Nền tảng này kết hợp sự linh hoạt của một trình soạn thảo văn bản (Rich Text Editor) với khả năng xử lý ngôn ngữ vượt trội của các mô hình LLM tiên tiến (Groq / LLaMA-3), được thiết kế chuyên biệt để giúp bạn viết lách tốt hơn, nhanh hơn và thông minh hơn.
 
-## ✨ Features
+## ✨ Các tính năng nổi bật
 
-### 📝 Core Editor
-- **Rich Text Formatting**: Built on top of TipTap, supporting bold, italics, highlights, and custom heading hierarchies.
-- **Advanced Blocks**: Native support for tables, blockquotes, code blocks, checklists, and inline images.
-- **Custom Link Handling**: Slack-like link insertion (`Ctrl+K` / Toolbar) with display text formatting.
-- **Find & Replace**: Built-in specialized search panel (`Ctrl+F` / `Ctrl+H`) working seamlessly with keyboard navigation.
-- **Auto-Save**: Documents are synced automatically to local IndexedDB and Firebase.
+### 📝 Trình soạn thảo Cốt lõi (Core Editor)
+- **Định dạng Văn bản Nâng cao**: Xây dựng dựa trên nền tảng TipTap, hỗ trợ in đậm, in nghiêng, highlight, và cấu trúc tiêu đề (Heading) đầy đủ.
+- **Khối chức năng đa dạng (Advanced Blocks)**: Hỗ trợ tạo bảng (Tables), trích dẫn (Blockquotes), chèn mã nguồn (Code blocks), danh sách công việc (Checklists) và chèn ảnh nội tuyến tiện lợi.
+- **Chèn Liên kết Hiện đại**: Giao diện chèn link dạng popup tương tự Slack (phím tắt `Ctrl+K` hoặc dùng Toolbar) cho phép tuỳ chỉnh chữ hiển thị.
+- **Tìm kiếm & Thay thế (Find & Replace)**: Panel tìm kiếm chuyên dụng tích hợp sẵn (`Ctrl+F` / `Ctrl+H`), hoạt động mượt mà kết hợp với điều hướng luân chuyển bằng bàn phím.
+- **Lưu tự động (Auto-Save)**: Tài liệu của bạn luôn được an toàn nhờ cơ chế đồng bộ theo thời gian thực xuống IndexedDB (cục bộ) và Firebase (đám mây).
 
-### 🤖 AI Writing Suite
-Powered by the ultra-fast Groq API, featuring:
-- **Smart Compose**: Brainstorm, outline, expand, shorten, or fix grammar with one click.
-- **Magic Translate**: Instant translation across 15+ languages.
-- **Tone Adjustment**: Shift your writing tone (Professional, Casual, Confident, Friendly).
-- **Expert Personas**: Rewrite content through the lens of a Tech Lead, Marketing Expert, or Academic Researcher.
-- **Contextual Inline AI**: Highlight text and interact with the floating AI menu to modify specific sentences.
+### 🤖 Bộ công cụ Trợ lý AI (AI Writing Suite)
+Được tiếp sức bởi tốc độ suy luận siêu tốc của Groq API:
+- **Soạn thảo Thông minh (Smart Compose)**: Chỉ với một cú nhấp chuột, AI sẽ giúp bạn lên ý tưởng, lập dàn ý, mở rộng, việt hoá, rút gọn hoặc tự động sửa lỗi ngữ pháp.
+- **Dịch thuật Thần tốc (Magic Translate)**: Dịch thuật tức thời hỗ trợ hơn 15+ ngôn ngữ.
+- **Điều chỉnh Giọng văn (Tone Adjustment)**: Chuyển đổi linh hoạt văn phong của bạn (Chuyên nghiệp, Gần gũi, Tự tin, Mộc mạc).
+- **Chuyên gia Định danh (Expert Personas)**: Đóng vai và viết lại nội dung góc nhìn của một Giám đốc Công nghệ (Tech Lead), Chuyên gia Marketing, hoặc Nhà nghiên cứu Học thuật.
+- **Hỗ trợ Nội tuyến (Contextual Inline AI)**: Bôi đen một đoạn text bất kỳ và thanh công cụ AI bay (Floating menu) sẽ hiện ra để bạn lập tức ra lệnh tinh chỉnh cấu trúc câu đó.
 
-### 🗂️ Document Management
-- **Dashboard**: A structured dashboard to organize recent work, favorites, and trash.
-- **Template Gallery**: Start quick with predefined layouts (Blog Post, Meeting Notes, Press Release, Job Descriptions, etc).
-- **Multi-Format Export**: Export your masterpiece flawlessly to **PDF (preserves styling)**, **Markdown (.md)**, **HTML**, and **Plain Text**.
+### 🗂️ Quản lý Tài liệu
+- **Bảng điều khiển (Dashboard)**: Quản lý khoa học tiến độ công việc với các thư mục Tài liệu gần đây, Yêu thích (Favorites) và Thùng rác (Trash).
+- **Thư viện Mẫu (Template Gallery)**: Bắt đầu viết lách nhanh chóng với các định dạng dựng sẵn (Bài đăng Blog, Biên bản Cuộc họp, Thông cáo Báo chí, Mô tả Công việc, v.v.).
+- **Xuất file Đa định dạng (Multi-Format Export)**: Đóng gói tác phẩm của bạn hoàn hảo sang định dạng **PDF (giữ nguyên tỷ lệ và font)**, **Markdown (.md)**, **HTML**, và **Text thuần**.
 
-### 💼 SaaS / Monetization Ready
-- **Paywall & Quotas**: Simulated monetization system. Free users get a daily quota (10 AI actions), seamlessly promoting a "Pro" tier upgrade via a slick interactive modal.
-- **User Settings**: Dedicated pane for self-hosting (BYOK - Bring Your Own Key) and customizing theme preferences.
-- **Onboarding Flow**: Beautiful step-by-step introduction modal for first-time users.
+### 💼 Sẵn sàng cho mô hình SaaS & Thương mại hoá
+- **Giới hạn & Tường phí (Paywall & Quotas)**: Hệ thống mô phỏng việc thương mại hoá. Người dùng Gói Miễn phí nhận được giới hạn hàng ngày (10 lượt gọi AI), cùng hệ thống Popup kêu gọi nâng cấp "Pro" xịn xò.
+- **Thiết lập Cá nhân (User Settings)**: Hỗ trợ nhập API Key cá nhân (Bring Your Own Key) để vượt giới hạn, và tuỳ chỉnh giao diện sáng/tối.
+- **Trải nghiệm Giới thiệu (Onboarding Flow)**: Cửa sổ Popup gồm các bước hướng dẫn cực đẹp mắt dành cho người dùng lần đầu đăng nhập.
 
-### 🎨 UI/UX Polish
-- **Dark/Light Mode**: Full CSS-variable based theme toggling.
-- **Responsive Design**: Mobile-friendly sidebar and floating AI panels.
-- **Loading Skeletons & Toasts**: Premium feedback loops for long-running operations.
-- **Error Boundaries**: Fail-safe mechanisms preventing pure white screens on crash.
+### 🎨 Tinh chỉnh UI/UX
+- **Giao diện Tối/Sáng (Dark/Light Mode)**: 100% tuỳ biến thông qua hệ thống biến số CSS (CSS-variable tokens).
+- **Thiết kế Thích ứng (Responsive)**: Tối ưu hoá hiển thị cho di động với thanh công cụ Sidebar và AI Panels dạng Overlay.
+- **Skeleton & Toasts**: Hiệu ứng chờ "tải khung" sang trọng và hệ thống thông báo trạng thái thao tác đẹp mắt.
+- **Bảo mật Lỗi (Error Boundaries)**: Đảm bảo nền tảng không bao giờ bị trắng trang (crash) hoàn toàn với cơ chế bắt lỗi an toàn.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Trụ cột Công nghệ (Tech Stack)
 
 - **Framework**: React 18 / Vite
-- **Editor Engine**: TipTap 
-- **Backend & Auth**: Firebase (Authentication, Firestore)
-- **Local Storage**: IndexedDB (via `idb` wrapper for large offline document cache)
-- **AI Provider**: Groq API (`llama-3.3-70b-versatile`)
-- **PDF Generation**: `html2pdf.js`
-- **Icons**: Lucide React
+- **Trình soạn thảo (Editor)**: TipTap 
+- **Backend & Xác thực**: Firebase (Authentication, Firestore)
+- **Lưu trữ Cục bộ**: IndexedDB (thông qua `idb` wrapper cho chức năng lưu Offline)
+- **Mô hình AI (LLM)**: Groq API (`llama-3.3-70b-versatile`)
+- **Xuất PDF**: `html2pdf.js`
+- **Bộ Icon**: Lucide React
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Hướng dẫn Cài đặt
 
-### Prerequisites
+### Yêu cầu hệ thống
 - Node.js (v18+)
-- Firebase Account (for Database & Auth setup)
-- Groq API Key (If no global fallback key is provided)
+- Tài khoản Firebase (Dùng để lấy API thiết lập Database & Auth)
+- Groq API Key (Nếu bạn không thiết lập fallback key trong code)
 
-### Installation
+### Các bước Cài đặt
 
-1. **Clone the repository**
+1. **Clone repository về máy**
    ```bash
    git clone https://github.com/hoangnguyen74/INT3509_3_Nhom7_AI_Writing_Assistant.git
    cd INT3509_3_Nhom7_AI_Writing_Assistant
    ```
 
-2. **Install dependencies**
+2. **Cài đặt các gói phụ thuộc (Dependencies)**
    ```bash
    npm install
    ```
 
-3. **Environment Setup**
-   Create a `.env` file in the root directory and add your Firebase credentials:
+3. **Thiết lập Môi trường (.env)**
+   Hãy tạo một file tên là `.env` ở thư mục gốc của dự án và điền thông tin Firebase của bạn vào:
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
@@ -79,46 +79,46 @@ Powered by the ultra-fast Groq API, featuring:
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_id
    VITE_FIREBASE_APP_ID=your_app_id
    
-   # Optional: Global AI Key if you want users to bypass BYOK
+   # Không bắt buộc: Key AI mặc định dành cho những users không sử dụng Key cá nhân (BYOK)
    VITE_GROQ_API_KEY=your_groq_key
    ```
 
-4. **Start the Development Server**
+4. **Khởi chạy Môi trường Phát triển (Development Server)**
    ```bash
    npm run dev
    ```
 
-5. **Build for Production**
+5. **Đóng gói Sản phẩm (Build for Production)**
    ```bash
    npm run build
    ```
 
 ---
 
-## 🏗️ Project Structure
+## 🏗️ Cấu trúc Thư mục
 
-\`\`\`text
+```text
 src/
-├── components/          # Reusable UI parts
-│   ├── AIPanel/         # Chat, Compose, Translate AI tabs
-│   ├── Editor/          # TipTap core, Toolbar, Find&Replace
-│   ├── Sidebar/         # App navigation, document list
-│   ├── Paywall/         # Monetization modals
-│   ├── Onboarding/      # Welcome flow
-│   └── TemplateGallery/ # Pre-built content layouts
-├── contexts/            # Global State Management (AppContext)
-├── pages/               # Top-level Routing (AuthPage, etc)
-├── services/            # API & DB utilities
-│   ├── groq.js          # AI Prompts & Call logic
-│   ├── export.js        # Markdown, HTML, PDF handlers
-│   ├── storage.js       # IndexedDB offline logic
-│   └── auth.js          # Firebase Auth logic
-├── App.jsx              # Main App entry (Dashboard/Editor router)
-├── main.jsx             # React DOM bindings + ErrorBoundary
-└── base.css...          # CSS Tokens & Styling
-\`\`\`
+├── components/          # Chứa các mảnh UI tái sử dụng
+│   ├── AIPanel/         # Sidebar Trợ lý ảo AI (Chat, Translate...)
+│   ├── Editor/          # Trình soạn thảo TipTap, Toolbar, Find&Replace
+│   ├── Sidebar/         # Thanh điều hướng, Danh sách văn bản
+│   ├── Paywall/         # Popup thông báo Nâng cấp
+│   ├── Onboarding/      # Màn hình Giới thiệu tính năng
+│   └── TemplateGallery/ # Giao diện Thư viện Mẫu
+├── contexts/            # Quản lý Trạng thái Toàn cục (AppContext)
+├── pages/               # Tầng Routing mức trên cùng (Ví dụ: AuthPage)
+├── services/            # Các hàm gọi API & Database
+│   ├── groq.js          # Chứa Prompt và Logic kết nối AI
+│   ├── export.js        # Logic xuất file (Markdown, HTML, PDF)
+│   ├── storage.js       # Quản lý lưu trữ Offline qua IndexedDB
+│   └── auth.js          # Logic xác thực Firebase Auth
+├── App.jsx              # Tệp chạy chính (Kết nối Dashboard/Editor/Sidebar)
+├── main.jsx             # Điểm entry của React DOM + Lớp màng lọc lỗi
+└── base.css...          # Khai báo các thiết lập và biến số CSS
+```
 
 ---
 
-## 📜 License & Academic Context
-This project was initially shaped and completed for the **INT3509_3 (AI Writing Assistant)** academic course module. Functioning as a high-fidelity prototype, it successfully demonstrates integration of modern React architectures side-by-side with raw AI prompt-engineering methodologies.
+## 📜 Giới thiệu Bối cảnh Lưu trữ
+Dự án này được lên ý tưởng và hoàn thiện nhằm phục vụ cho học phần **INT3509_3 (Môn học: AI Writing Assistant)**. Đóng vai trò là một nguyên mẫu chất lượng cao (high-fidelity prototype), dự án chứng minh thành công việc tích hợp kiến trúc ứng dụng React web hiện đại với những phương pháp Prompt-Engineering trực tiếp trong việc kết nối với trí tuệ nhân tạo.
