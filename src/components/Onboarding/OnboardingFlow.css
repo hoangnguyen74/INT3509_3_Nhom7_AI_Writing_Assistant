@@ -97,8 +97,8 @@
 
 /* ========== Content ========== */
 .onboarding__content {
-  padding: var(--space-6) var(--space-6) var(--space-4);
-  min-height: 380px;
+  padding: var(--space-8) var(--space-10) var(--space-8);
+  min-height: 440px;
   display: flex;
   flex-direction: column;
 }
@@ -119,10 +119,10 @@
 
 .onboarding__subtitle {
   color: var(--text-secondary);
-  font-size: var(--font-sm);
+  font-size: 1.05rem;
   line-height: 1.6;
-  max-width: 480px;
-  margin-bottom: var(--space-5);
+  max-width: 580px;
+  margin-bottom: var(--space-6);
 }
 
 .gradient-text {
@@ -162,16 +162,16 @@
 .onboarding__features {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
   width: 100%;
-  max-width: 420px;
+  max-width: 580px;
 }
 
 .onboarding__feature-card {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
   text-align: left;
@@ -189,8 +189,8 @@
 
 .onboarding__feature-card p {
   color: var(--text-tertiary);
-  font-size: var(--font-xs);
-  margin-top: 2px;
+  font-size: 0.95rem;
+  margin-top: 4px;
 }
 
 /* Instructions */
