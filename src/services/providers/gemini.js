@@ -37,8 +37,18 @@ export async function geminiGenerate(systemPrompt, userPrompt, onChunk, options 
     },
   };
 
+  const isGemmaModel = modelId.startsWith('gemma');
   if (systemPrompt) {
-    body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    if (isGemmaModel) {
+      // Gemma models don't support systemInstruction — prepend to first user message
+      if (contents.length > 0 && contents[0].role === 'user') {
+        contents[0].parts[0].text = `${systemPrompt}\n\n${contents[0].parts[0].text}`;
+      } else {
+        contents.unshift({ role: 'user', parts: [{ text: systemPrompt }] });
+      }
+    } else {
+      body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    }
   }
 
   if (stream) {

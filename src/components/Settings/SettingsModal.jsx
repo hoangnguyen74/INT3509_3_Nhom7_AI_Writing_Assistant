@@ -240,100 +240,106 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
           {/* Setup Guide */}
           <SetupGuide providerId={activeTab} t={t} />
 
-          {/* API Key (Groq & Gemini) */}
+          {/* API Key + Model in 2-column layout (Groq & Gemini) */}
           {config.requiresApiKey && (
-            <div className="settings-form-section">
-              <label className="settings-label">
-                <Key size={14} />
-                {t('settings.apiKey')}
-              </label>
-              <p className="settings-hint">
-                {t('settings.getFreeKey')}{' '}
-                <a href={config.apiKeyUrl} target="_blank" rel="noreferrer">
-                  {config.apiKeyLabel} <ExternalLink size={12} />
-                </a>
-              </p>
-              <div className="settings-input-group">
-                <input
-                  type={showKey ? 'text' : 'password'}
-                  className="settings-input"
-                  value={providerSettings.apiKey || ''}
-                  onChange={e => updateProviderField(activeTab, 'apiKey', e.target.value)}
-                  placeholder={config.apiKeyPlaceholder}
-                />
-                <button
-                  className="settings-input-toggle"
-                  onClick={() => setShowKey(!showKey)}
-                  title={showKey ? 'Hide key' : 'Show key'}
+            <div className="settings-form-row">
+              <div className="settings-form-section">
+                <label className="settings-label">
+                  <Key size={14} />
+                  {t('settings.apiKey')}
+                </label>
+                <p className="settings-hint">
+                  {t('settings.getFreeKey')}{' '}
+                  <a href={config.apiKeyUrl} target="_blank" rel="noreferrer">
+                    {config.apiKeyLabel} <ExternalLink size={12} />
+                  </a>
+                </p>
+                <div className="settings-input-group">
+                  <input
+                    type={showKey ? 'text' : 'password'}
+                    className="settings-input"
+                    value={providerSettings.apiKey || ''}
+                    onChange={e => updateProviderField(activeTab, 'apiKey', e.target.value)}
+                    placeholder={config.apiKeyPlaceholder}
+                  />
+                  <button
+                    className="settings-input-toggle"
+                    onClick={() => setShowKey(!showKey)}
+                    title={showKey ? 'Hide key' : 'Show key'}
+                  >
+                    {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+              <div className="settings-form-section">
+                <label className="settings-label">
+                  {t('settings.model')}
+                </label>
+                <p className="settings-hint">&nbsp;</p>
+                <select
+                  className="settings-select"
+                  value={providerSettings.model || ''}
+                  onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
                 >
-                  {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+                  {config.models.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}{m.default ? ` ${t('settings.default')}` : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
 
-          {/* Ollama Base URL */}
+          {/* Ollama: URL + Model in 2-column layout */}
           {activeTab === 'ollama' && (
-            <div className="settings-form-section">
-              <label className="settings-label">
-                <HardDrive size={14} />
-                {t('settings.ollamaUrl')}
-              </label>
-              <p className="settings-hint">
-                {t('settings.ollamaHint')}
-              </p>
-              <div className="settings-input-group">
-                <input
-                  type="text"
-                  className="settings-input"
-                  value={providerSettings.baseUrl || ''}
-                  onChange={e => updateProviderField(activeTab, 'baseUrl', e.target.value)}
-                  placeholder="http://localhost:11434"
-                />
-                <button
-                  className="settings-input-toggle"
-                  onClick={handleRefreshModels}
-                  disabled={loadingModels}
-                  title={t('settings.refreshModels')}
+            <div className="settings-form-row">
+              <div className="settings-form-section">
+                <label className="settings-label">
+                  <HardDrive size={14} />
+                  {t('settings.ollamaUrl')}
+                </label>
+                <p className="settings-hint">
+                  {t('settings.ollamaHint')}
+                </p>
+                <div className="settings-input-group">
+                  <input
+                    type="text"
+                    className="settings-input"
+                    value={providerSettings.baseUrl || ''}
+                    onChange={e => updateProviderField(activeTab, 'baseUrl', e.target.value)}
+                    placeholder="http://localhost:11434"
+                  />
+                  <button
+                    className="settings-input-toggle"
+                    onClick={handleRefreshModels}
+                    disabled={loadingModels}
+                    title={t('settings.refreshModels')}
+                  >
+                    <RefreshCw size={16} className={loadingModels ? 'wt-spinner' : ''} />
+                  </button>
+                </div>
+              </div>
+              <div className="settings-form-section">
+                <label className="settings-label">
+                  {t('settings.model')}
+                </label>
+                <p className="settings-hint">&nbsp;</p>
+                <select
+                  className="settings-select"
+                  value={providerSettings.model || ''}
+                  onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
                 >
-                  <RefreshCw size={16} className={loadingModels ? 'wt-spinner' : ''} />
-                </button>
+                  <option value="">
+                    {loadingModels ? t('settings.loadingModels') : ollamaModels.length === 0 ? t('settings.noModels') : t('settings.selectModel')}
+                  </option>
+                  {ollamaModels.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
-
-          {/* Model Selection */}
-          <div className="settings-form-section">
-            <label className="settings-label">
-              {t('settings.model')}
-            </label>
-            {activeTab === 'ollama' ? (
-              <select
-                className="settings-select"
-                value={providerSettings.model || ''}
-                onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
-              >
-                <option value="">
-                  {loadingModels ? t('settings.loadingModels') : ollamaModels.length === 0 ? t('settings.noModels') : t('settings.selectModel')}
-                </option>
-                {ollamaModels.map(m => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
-              </select>
-            ) : (
-              <select
-                className="settings-select"
-                value={providerSettings.model || getProviderSettings(activeTab).model || ''}
-                onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
-              >
-                {config.models.map(m => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}{m.default ? ` ${t('settings.default')}` : ''}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
 
           {/* Test Result */}
           {testResult && (
