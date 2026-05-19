@@ -2,6 +2,7 @@
 // Template Gallery — Pre-made document templates
 // ========================================
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, FileText, Mail, BarChart3, Users, BookOpen, Megaphone, ClipboardList, Lightbulb } from 'lucide-react';
 import './TemplateGallery.css';
 
@@ -136,6 +137,7 @@ const TEMPLATES = [
 ];
 
 export default function TemplateGallery({ isOpen, onClose, onSelect }) {
+  const { t } = useTranslation();
   const [hoveredId, setHoveredId] = useState(null);
 
   if (!isOpen) return null;
@@ -145,8 +147,8 @@ export default function TemplateGallery({ isOpen, onClose, onSelect }) {
       <div className="template-gallery fade-in" onClick={e => e.stopPropagation()}>
         <div className="template-gallery__header">
           <div>
-            <h2>📄 Choose a Template</h2>
-            <p>Start with a pre-built structure or a blank document</p>
+            <h2>📄 {t('templates.title')}</h2>
+            <p>{t('templates.subtitle')}</p>
           </div>
           <button className="template-gallery__close" onClick={onClose}><X size={20} /></button>
         </div>

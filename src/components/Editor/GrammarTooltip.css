@@ -1,0 +1,121 @@
+/* ========================================
+   Grammar Tooltip
+   ======================================== */
+
+.grammar-tooltip {
+  position: absolute;
+  z-index: 100;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 10px 12px;
+  max-width: 320px;
+  min-width: 200px;
+  font-size: var(--text-xs);
+  animation: fadeIn 0.15s ease;
+}
+
+.grammar-tooltip__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.grammar-tooltip__badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.grammar-tooltip__badge--grammar {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.grammar-tooltip__badge--spelling {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.grammar-tooltip__badge--punctuation {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.grammar-tooltip__badge--style {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+}
+
+.grammar-tooltip__reason {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.grammar-tooltip__suggestion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.grammar-tooltip__suggestion del {
+  color: #ef4444;
+  text-decoration: line-through;
+}
+
+.grammar-tooltip__suggestion ins {
+  color: #10b981;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.grammar-tooltip__arrow {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.grammar-tooltip__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.grammar-tooltip__fix-btn,
+.grammar-tooltip__dismiss-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.grammar-tooltip__fix-btn {
+  background: var(--primary-600);
+  color: white;
+}
+
+.grammar-tooltip__dismiss-btn {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.grammar-tooltip__fix-btn:hover,
+.grammar-tooltip__dismiss-btn:hover {
+  opacity: 0.85;
+}

@@ -20,7 +20,8 @@ const DEFAULT_SETTINGS = {
   isPro: false,
   apiCalls: 0,
   lastCallDate: null,
-  activePersona: 'general', // for Phase 7 Personas
+  activePersona: 'general',
+  aiProvider: 'groq',
 };
 
 // Actions

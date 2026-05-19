@@ -2,28 +2,29 @@
 // Inline AI Menu — Floating action menu on text selection
 // ========================================
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FileText, RefreshCw, Languages, Maximize2, Minimize2,
   SpellCheck, Copy, Check, Replace, X, Loader2
 } from 'lucide-react';
 import {
   summarize, paraphrase, translate, expandText,
-  shortenText, checkGrammar
-} from '../../services/groq';
-import { getApiKey } from '../../services/groq';
+  shortenText, checkGrammar, isAIConfigured
+} from '../../services/ai';
 import './InlineAIMenu.css';
 
-const ACTIONS = [
-  { id: 'summarize', label: 'Summarize', icon: FileText },
-  { id: 'rewrite', label: 'Rewrite', icon: RefreshCw },
-  { id: 'grammar', label: 'Grammar', icon: SpellCheck },
-  { id: 'translate', label: 'Translate', icon: Languages },
-  { id: 'expand', label: 'Expand', icon: Maximize2 },
-  { id: 'shorten', label: 'Shorten', icon: Minimize2 },
-];
-
 export default function InlineAIMenu({ editor }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
+
+  const ACTIONS = [
+    { id: 'summarize', label: t('inline.summarize'), icon: FileText },
+    { id: 'rewrite', label: t('inline.rewrite'), icon: RefreshCw },
+    { id: 'grammar', label: t('inline.grammar'), icon: SpellCheck },
+    { id: 'translate', label: t('inline.translate'), icon: Languages },
+    { id: 'expand', label: t('inline.expand'), icon: Maximize2 },
+    { id: 'shorten', label: t('inline.shorten'), icon: Minimize2 },
+  ];
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
@@ -39,7 +40,7 @@ export default function InlineAIMenu({ editor }) {
     const handleSelectionUpdate = () => {
       const { from, to } = editor.state.selection;
       const hasSelection = from !== to;
-      const hasApiKey = !!getApiKey();
+      const hasApiKey = isAIConfigured();
 
       if (hasSelection && hasApiKey && !loading) {
         // Get selection coordinates
@@ -144,7 +145,7 @@ export default function InlineAIMenu({ editor }) {
       {loading && (
         <div className="inline-ai-menu__loading">
           <Loader2 size={14} className="wt-spinner" />
-          <span>Processing...</span>
+          <span>{t('chat.processing')}</span>
         </div>
       )}
 
@@ -162,14 +163,14 @@ export default function InlineAIMenu({ editor }) {
           <div className="inline-ai-menu__result-text">{result}</div>
           <div className="inline-ai-menu__result-actions">
             <button className="wt-action-btn wt-action-btn--primary" onClick={handleApply}>
-              <Replace size={12} /> Apply
+              <Replace size={12} /> {t('inline.apply')}
             </button>
             <button className="wt-action-btn" onClick={handleCopy}>
               {copied ? <Check size={12} /> : <Copy size={12} />}
-              {copied ? 'Copied!' : 'Copy'}
+              {copied ? t('compose.copied') : t('compose.copy')}
             </button>
             <button className="wt-action-btn" onClick={handleDismiss}>
-              <X size={12} /> Dismiss
+              <X size={12} /> {t('inline.dismiss')}
             </button>
           </div>
         </div>

@@ -2,11 +2,12 @@
 // AI Translate — Multi-language translation
 // ========================================
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Languages, ArrowRightLeft, Copy, Check, Replace,
   Loader2, AlertCircle
 } from 'lucide-react';
-import { translate, LANGUAGE_NAMES } from '../../services/groq';
+import { translate, LANGUAGE_NAMES } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
 
 const LANGUAGES = [
@@ -26,6 +27,7 @@ const LANGUAGES = [
 ];
 
 export default function AITranslate({ editor, isReady }) {
+  const { t } = useTranslation();
   const { checkApiQuota, openPaywall } = useApp();
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('en');
@@ -52,11 +54,11 @@ export default function AITranslate({ editor, isReady }) {
   const handleTranslate = useCallback(async () => {
     const text = getText();
     if (!text.trim()) {
-      setError('Write or select some text to translate.');
+      setError(t('translate.noText'));
       return;
     }
     if (sourceLang === targetLang && sourceLang !== 'auto') {
-      setError('Source and target languages are the same.');
+      setError(t('translate.sameLang'));
       return;
     }
 
@@ -94,7 +96,7 @@ export default function AITranslate({ editor, isReady }) {
       {/* Language Selectors */}
       <div className="translate-langs">
         <div className="translate-lang-field">
-          <label className="compose-label">From</label>
+          <label className="compose-label">{t('translate.from')}</label>
           <select
             className="compose-select"
             value={sourceLang}
@@ -110,13 +112,13 @@ export default function AITranslate({ editor, isReady }) {
           className="translate-swap-btn"
           onClick={handleSwap}
           disabled={sourceLang === 'auto'}
-          title="Swap languages"
+          title={t('translate.swapLanguages')}
         >
           <ArrowRightLeft size={16} />
         </button>
 
         <div className="translate-lang-field">
-          <label className="compose-label">To</label>
+          <label className="compose-label">{t('translate.to')}</label>
           <select
             className="compose-select"
             value={targetLang}
@@ -136,9 +138,9 @@ export default function AITranslate({ editor, isReady }) {
         disabled={loading || !isReady}
       >
         {loading ? (
-          <><Loader2 size={16} className="wt-spinner" /> Translating...</>
+          <><Loader2 size={16} className="wt-spinner" /> {t('translate.translating')}</>
         ) : (
-          <><Languages size={16} /> Translate</>
+          <><Languages size={16} /> {t('translate.translate')}</>
         )}
       </button>
 
@@ -155,16 +157,16 @@ export default function AITranslate({ editor, isReady }) {
         <div className="wt-result fade-in">
           <div className="wt-result__header">
             <span className="wt-result__label">
-              🌐 Translation ({LANGUAGE_NAMES[targetLang] || targetLang})
+              🌐 {t('translate.translation')} ({LANGUAGE_NAMES[targetLang] || targetLang})
             </span>
             <div className="wt-result__actions">
               <button className="wt-action-btn" onClick={handleCopy}>
                 {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? t('compose.copied') : t('compose.copy')}
               </button>
               <button className="wt-action-btn wt-action-btn--primary" onClick={handleApply}>
                 <Replace size={13} />
-                Apply
+                {t('translate.apply')}
               </button>
             </div>
           </div>
@@ -175,7 +177,7 @@ export default function AITranslate({ editor, isReady }) {
       {/* Hint */}
       {!loading && !result && !error && (
         <p className="wt-hint">
-          💡 Select text in the editor to translate a specific part, or translate the entire document. Supports 12+ languages.
+          💡 {t('translate.hint')}
         </p>
       )}
     </div>

@@ -2,14 +2,16 @@
 // AI Chat — Conversational AI assistant
 // ========================================
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Send, Trash2, ArrowDownToLine, Copy, Check,
   Loader2, ToggleLeft, ToggleRight
 } from 'lucide-react';
-import { chat } from '../../services/groq';
+import { chat } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
 
 export default function AIChat({ editor, isReady }) {
+  const { t } = useTranslation();
   const { checkApiQuota, openPaywall, settings } = useApp();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -117,10 +119,10 @@ export default function AIChat({ editor, isReady }) {
           title="Include editor content as context"
         >
           {includeContext ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-          <span>Editor context</span>
+          <span>{t('chat.editorContext')}</span>
         </button>
         {messages.length > 0 && (
-          <button className="chat-clear-btn" onClick={handleClearChat} title="Clear chat">
+          <button className="chat-clear-btn" onClick={handleClearChat} title={t('chat.clearChat')}>
             <Trash2 size={14} />
           </button>
         )}
@@ -131,15 +133,15 @@ export default function AIChat({ editor, isReady }) {
         {messages.length === 0 && (
           <div className="chat-empty">
             <span className="chat-empty__icon">💬</span>
-            <p>Start a conversation with AI</p>
+            <p>{t('chat.startConversation')}</p>
             <span className="chat-empty__hint">
-              Ask questions, brainstorm ideas, or get help with your writing.
+              {t('chat.hint')}
             </span>
             <div className="chat-suggestions">
               {[
-                'Help me brainstorm ideas for my essay',
-                'What\'s a good opening for my blog post?',
-                'Explain this concept in simpler terms',
+                t('chat.suggestion1'),
+                t('chat.suggestion2'),
+                t('chat.suggestion3'),
               ].map((suggestion, i) => (
                 <button
                   key={i}
@@ -184,7 +186,7 @@ export default function AIChat({ editor, isReady }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask AI anything..."
+          placeholder={t('chat.placeholder')}
           rows={1}
           disabled={loading || !isReady}
         />

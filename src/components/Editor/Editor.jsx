@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -14,14 +15,22 @@ import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { Link } from '@tiptap/extension-link';
 import CharacterCount from '@tiptap/extension-character-count';
+import { GrammarHighlight } from './extensions/GrammarHighlight';
+import { useGrammarCheck } from '../../hooks/useGrammarCheck';
+import { useApp } from '../../contexts/AppContext';
 import Toolbar from './Toolbar';
 import AIToolbar from './AIToolbar';
 import DiffSuggestion from './DiffSuggestion';
 import InlineAIMenu from './InlineAIMenu';
 import FindReplace from './FindReplace';
+import GrammarTooltip from './GrammarTooltip';
+import GrammarPanel from './GrammarPanel';
+import { SpellCheck } from 'lucide-react';
 import './Editor.css';
 
 export default function Editor({ initialContent, onEditorReady, onUpdate }) {
+  const { t } = useTranslation();
+  const { checkApiQuota, openPaywall } = useApp();
   const [wordCount, setWordCount] = useState({ words: 0, characters: 0, paragraphs: 0 });
   const [readingTime, setReadingTime] = useState(0);
 
@@ -30,6 +39,8 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
   const [showFind, setShowFind] = useState(false);
+  const [showGrammarPanel, setShowGrammarPanel] = useState(false);
+  const [grammarEnabled, setGrammarEnabled] = useState(false);
 
   // Ctrl+F / Ctrl+H keyboard shortcuts
   useEffect(() => {
@@ -82,6 +93,7 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
         autolink: true,
       }),
       CharacterCount,
+      GrammarHighlight,
     ],
     content: initialContent || '<p></p>',
     editorProps: {
@@ -132,6 +144,17 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
     },
   });
 
+  // Grammar check hook
+  const grammar = useGrammarCheck(editor, grammarEnabled);
+
+  // Schedule grammar check on editor updates
+  useEffect(() => {
+    if (!editor || !grammarEnabled) return;
+    const handler = () => grammar.scheduleCheck(checkApiQuota, openPaywall);
+    editor.on('update', handler);
+    return () => editor.off('update', handler);
+  }, [editor, grammarEnabled, grammar.scheduleCheck, checkApiQuota, openPaywall]);
+
   const handleAcceptAI = useCallback(() => {
     if (!editor || !aiResult) return;
     const finalResult = aiResult.includes('---') ? aiResult.split('---')[1].trim() : aiResult;
@@ -166,8 +189,14 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
       <div className="editor-content-wrapper">
         <FindReplace editor={editor} isOpen={showFind} onClose={() => setShowFind(false)} />
         <InlineAIMenu editor={editor} />
+        <GrammarTooltip
+          editor={editor}
+          errors={grammar.errors}
+          onFix={grammar.acceptFix}
+          onDismiss={grammar.dismissError}
+        />
         <EditorContent editor={editor} className="editor-content" />
-        
+
         <DiffSuggestion
            result={aiResult}
            loading={aiLoading}
@@ -175,17 +204,46 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
            onAccept={handleAcceptAI}
            onReject={handleRejectAI}
         />
+
+        {showGrammarPanel && (
+          <GrammarPanel
+            errors={grammar.errors}
+            isChecking={grammar.isChecking}
+            editor={editor}
+            onCheckNow={() => grammar.checkNow(checkApiQuota, openPaywall)}
+            onFix={grammar.acceptFix}
+            onFixAll={grammar.acceptAll}
+            onDismiss={grammar.dismissError}
+            onClearAll={grammar.clearAll}
+            onClose={() => setShowGrammarPanel(false)}
+          />
+        )}
       </div>
 
       <div className="editor-statusbar">
         <div className="statusbar-info">
-          <span>{wordCount.words} words</span>
-          <span>{wordCount.characters} characters</span>
-          <span>{wordCount.paragraphs} paragraphs</span>
-          <span>~{readingTime} min read</span>
+          <span>{wordCount.words} {t('editor.words')}</span>
+          <span>{wordCount.characters} {t('editor.characters')}</span>
+          <span>{wordCount.paragraphs} {t('editor.paragraphs')}</span>
+          <span>~{readingTime} {t('editor.minRead')}</span>
         </div>
         <div className="statusbar-right">
-          <span className="statusbar-shortcut" title="Auto-save is enabled">Auto-save ✓</span>
+          <button
+            className={`statusbar-grammar-btn ${grammarEnabled ? 'statusbar-grammar-btn--active' : ''}`}
+            onClick={() => {
+              const next = !grammarEnabled;
+              setGrammarEnabled(next);
+              setShowGrammarPanel(next);
+              if (!next) grammar.clearAll();
+            }}
+            title={grammarEnabled ? 'Disable grammar check' : 'Enable grammar check'}
+          >
+            <SpellCheck size={13} />
+            {grammar.errors.length > 0 && (
+              <span className="statusbar-grammar-count">{grammar.errors.length}</span>
+            )}
+          </button>
+          <span className="statusbar-shortcut" title="Auto-save">{t('editor.autoSave')}</span>
           <span>WriteAI</span>
         </div>
       </div>

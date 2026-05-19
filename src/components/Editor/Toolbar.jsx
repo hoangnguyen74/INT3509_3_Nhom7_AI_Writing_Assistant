@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Highlighter, Undo2, Redo2, RemoveFormatting,
@@ -9,6 +10,7 @@ import LinkDialog from './LinkDialog';
 import './Toolbar.css'; // Let's add a specific css file for Toolbar if needed or use Editor.css
 
 export default function Toolbar({ editor }) {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
 
@@ -64,50 +66,50 @@ export default function Toolbar({ editor }) {
     {
       group: 'history',
       items: [
-        { icon: <Undo2 />, action: () => editor.chain().focus().undo().run(), active: false, title: 'Undo' },
-        { icon: <Redo2 />, action: () => editor.chain().focus().redo().run(), active: false, title: 'Redo' },
+        { icon: <Undo2 />, action: () => editor.chain().focus().undo().run(), active: false, title: t('toolbar.undo') },
+        { icon: <Redo2 />, action: () => editor.chain().focus().redo().run(), active: false, title: t('toolbar.redo') },
       ]
     },
     {
       group: 'text',
       items: [
-        { icon: <Bold />, action: () => editor.chain().focus().toggleBold().run(), active: editor.isActive('bold'), title: 'Bold' },
-        { icon: <Italic />, action: () => editor.chain().focus().toggleItalic().run(), active: editor.isActive('italic'), title: 'Italic' },
-        { icon: <UnderlineIcon />, action: () => editor.chain().focus().toggleUnderline().run(), active: editor.isActive('underline'), title: 'Underline' },
-        { icon: <Highlighter />, action: () => editor.chain().focus().toggleHighlight().run(), active: editor.isActive('highlight'), title: 'Highlight' },
-        { icon: <LinkIcon />, action: openLinkDialog, active: editor.isActive('link'), title: 'Link' },
+        { icon: <Bold />, action: () => editor.chain().focus().toggleBold().run(), active: editor.isActive('bold'), title: t('toolbar.bold') },
+        { icon: <Italic />, action: () => editor.chain().focus().toggleItalic().run(), active: editor.isActive('italic'), title: t('toolbar.italic') },
+        { icon: <UnderlineIcon />, action: () => editor.chain().focus().toggleUnderline().run(), active: editor.isActive('underline'), title: t('toolbar.underline') },
+        { icon: <Highlighter />, action: () => editor.chain().focus().toggleHighlight().run(), active: editor.isActive('highlight'), title: t('toolbar.highlight') },
+        { icon: <LinkIcon />, action: openLinkDialog, active: editor.isActive('link'), title: t('toolbar.link') },
         { icon: <Unlink />, action: () => editor.chain().focus().unsetLink().run(), active: false, title: 'Unlink', visible: editor.isActive('link') },
       ]
     },
     {
       group: 'heading',
       items: [
-        { icon: <Heading1 />, action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: editor.isActive('heading', { level: 1 }), title: 'Heading 1' },
-        { icon: <Heading2 />, action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: editor.isActive('heading', { level: 2 }), title: 'Heading 2' },
-        { icon: <Heading3 />, action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: editor.isActive('heading', { level: 3 }), title: 'Heading 3' },
+        { icon: <Heading1 />, action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: editor.isActive('heading', { level: 1 }), title: t('toolbar.h1') },
+        { icon: <Heading2 />, action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: editor.isActive('heading', { level: 2 }), title: t('toolbar.h2') },
+        { icon: <Heading3 />, action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: editor.isActive('heading', { level: 3 }), title: t('toolbar.h3') },
       ]
     },
     {
       group: 'list',
       items: [
-        { icon: <List />, action: () => editor.chain().focus().toggleBulletList().run(), active: editor.isActive('bulletList'), title: 'Bullet List' },
-        { icon: <ListOrdered />, action: () => editor.chain().focus().toggleOrderedList().run(), active: editor.isActive('orderedList'), title: 'Ordered List' },
-        { icon: <CheckSquare />, action: () => editor.chain().focus().toggleTaskList().run(), active: editor.isActive('taskList'), title: 'Task List' },
-        { icon: <Quote />, action: () => editor.chain().focus().toggleBlockquote().run(), active: editor.isActive('blockquote'), title: 'Blockquote' },
-        { icon: <Code />, action: () => editor.chain().focus().toggleCodeBlock().run(), active: editor.isActive('codeBlock'), title: 'Code Block' },
+        { icon: <List />, action: () => editor.chain().focus().toggleBulletList().run(), active: editor.isActive('bulletList'), title: t('toolbar.bulletList') },
+        { icon: <ListOrdered />, action: () => editor.chain().focus().toggleOrderedList().run(), active: editor.isActive('orderedList'), title: t('toolbar.orderedList') },
+        { icon: <CheckSquare />, action: () => editor.chain().focus().toggleTaskList().run(), active: editor.isActive('taskList'), title: t('toolbar.taskList') },
+        { icon: <Quote />, action: () => editor.chain().focus().toggleBlockquote().run(), active: editor.isActive('blockquote'), title: t('toolbar.blockquote') },
+        { icon: <Code />, action: () => editor.chain().focus().toggleCodeBlock().run(), active: editor.isActive('codeBlock'), title: t('toolbar.codeBlock') },
       ]
     },
     {
       group: 'insert',
       items: [
-        { icon: <ImageIcon />, action: () => fileInputRef.current?.click(), active: false, title: 'Insert Image' },
-        { icon: <TableIcon />, action: insertTable, active: editor.isActive('table'), title: 'Insert Table' },
+        { icon: <ImageIcon />, action: () => fileInputRef.current?.click(), active: false, title: t('toolbar.image') },
+        { icon: <TableIcon />, action: insertTable, active: editor.isActive('table'), title: t('toolbar.insertTable') },
       ]
     },
     {
       group: 'clear',
       items: [
-        { icon: <RemoveFormatting />, action: () => editor.chain().focus().clearNodes().unsetAllMarks().run(), active: false, title: 'Clear Formatting' },
+        { icon: <RemoveFormatting />, action: () => editor.chain().focus().clearNodes().unsetAllMarks().run(), active: false, title: t('toolbar.clearFormatting') },
       ]
     }
   ];
@@ -115,7 +117,7 @@ export default function Toolbar({ editor }) {
   const tableControls = editor.isActive('table') ? [
     { icon: <Columns strokeWidth={1.5} />, action: () => editor.chain().focus().addColumnAfter().run(), title: 'Add Column' },
     { icon: <Rows strokeWidth={1.5} />, action: () => editor.chain().focus().addRowAfter().run(), title: 'Add Row' },
-    { icon: <Trash2 strokeWidth={1.5} />, action: () => editor.chain().focus().deleteTable().run(), title: 'Delete Table', danger: true },
+    { icon: <Trash2 strokeWidth={1.5} />, action: () => editor.chain().focus().deleteTable().run(), title: t('toolbar.deleteTable'), danger: true },
   ] : [];
 
   return (
@@ -150,7 +152,7 @@ export default function Toolbar({ editor }) {
       {/* Dynamic Table Controls (appears below main toolbar when table is active) */}
       {tableControls.length > 0 && (
         <div className="editor-toolbar-secondary fade-in">
-          <span className="toolbar-label">Table:</span>
+          <span className="toolbar-label">{t('toolbar.table')}</span>
           <div className="toolbar-group">
             {tableControls.map((btn, i) => (
               <button
