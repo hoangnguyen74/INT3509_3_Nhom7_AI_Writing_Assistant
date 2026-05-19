@@ -275,7 +275,6 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
                 <label className="settings-label">
                   {t('settings.model')}
                 </label>
-                <p className="settings-hint">&nbsp;</p>
                 <select
                   className="settings-select"
                   value={providerSettings.model || ''}
@@ -324,7 +323,6 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
                 <label className="settings-label">
                   {t('settings.model')}
                 </label>
-                <p className="settings-hint">&nbsp;</p>
                 <select
                   className="settings-select"
                   value={providerSettings.model || ''}

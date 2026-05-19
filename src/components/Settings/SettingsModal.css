@@ -3,19 +3,19 @@
    ======================================== */
 
 .settings-modal--wide {
-  max-width: 760px;
-  width: 92vw;
+  max-width: 640px;
+  width: 80vw;
 }
 
 .settings-modal--wide .settings-modal__body {
-  padding: 28px 32px;
+  padding: 24px 28px;
 }
 
 /* Provider Tabs */
 .settings-provider-tabs {
   display: flex;
   gap: 0;
-  padding: 0 32px;
+  padding: 0 28px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-secondary);
 }
@@ -166,10 +166,10 @@
 
 /* Form Sections */
 .settings-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 0;
 }
 
 .settings-form-section {
