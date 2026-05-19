@@ -31,7 +31,6 @@ export const PROVIDER_CONFIG = {
     apiKeyLabel: 'Google AI Studio',
     models: [
       { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', default: true },
-      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
       { id: 'gemma-4-31b-it', name: 'Gemma 4 31B' },
       { id: 'gemma-4-26b-a4b-it', name: 'Gemma 4 26B MoE' },
     ],

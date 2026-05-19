@@ -170,14 +170,6 @@
   font-family: monospace;
 }
 
-/* Form — 2 columns side by side */
-.settings-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin-bottom: 0;
-}
-
 .settings-form-section {
   margin-bottom: 20px;
 }
@@ -242,15 +234,27 @@
   opacity: 0.9;
 }
 
-/* Actions row — own line at bottom */
-.settings-modal__actions {
+/* Actions row — Test + Set Active on same line */
+.settings-modal__actions-row {
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-top: 28px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+/* Save row — alone on its own line */
+.settings-modal__save-row {
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--border);
-  flex-wrap: wrap;
+}
+
+.settings-btn--save {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 24px;
+  font-size: var(--text-base);
 }
 
 /* Test result */
@@ -260,8 +264,8 @@
 
 /* Responsive */
 @media (max-width: 640px) {
-  .settings-form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .settings-modal__actions-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
