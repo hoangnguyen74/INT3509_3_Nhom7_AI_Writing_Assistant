@@ -1,34 +1,39 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Sparkles, FileText, SpellCheck, Palette, RefreshCw, 
+  Sparkles, FileText, SpellCheck, Palette, RefreshCw,
   Maximize2, Minimize2, Lightbulb, ChevronDown, Check
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import {
   summarize, checkGrammar, changeTone, paraphrase,
   expandText, shortenText, improveReadability
-} from '../../services/groq';
+} from '../../services/ai';
 import './AIToolbar.css';
 
-const AI_TOOLS = [
-  { id: 'summarize', label: 'Summarize', icon: FileText, category: 'improve' },
-  { id: 'grammar', label: 'Fix Grammar', icon: SpellCheck, category: 'improve' },
-  { id: 'readability', label: 'Readability', icon: Lightbulb, category: 'improve' },
-  { id: 'paraphrase', label: 'Paraphrase', icon: RefreshCw, category: 'creative' },
-  { id: 'expand', label: 'Expand', icon: Maximize2, category: 'creative' },
-  { id: 'shorten', label: 'Shorten', icon: Minimize2, category: 'creative' },
-];
-
-const TONES = ['Professional', 'Friendly', 'Academic', 'Sales', 'Creative'];
-const PERSONAS = [
-  { id: 'general', label: 'General Assistant' },
-  { id: 'it', label: 'IT & Tech Lead' },
-  { id: 'sales', label: 'Marketing & Sales' },
-  { id: 'academic', label: 'Academic Researcher' },
-];
-
 export default function AIToolbar({ editor, onResult, onError, onLoading }) {
+  const { t } = useTranslation();
   const { settings, updateSettings, checkApiQuota, openPaywall } = useApp();
+
+  const AI_TOOLS = [
+    { id: 'summarize', label: t('ai.summarize'), icon: FileText, category: 'improve' },
+    { id: 'grammar', label: t('ai.fixGrammar'), icon: SpellCheck, category: 'improve' },
+    { id: 'readability', label: t('ai.readability'), icon: Lightbulb, category: 'improve' },
+    { id: 'paraphrase', label: t('ai.paraphrase'), icon: RefreshCw, category: 'creative' },
+    { id: 'expand', label: t('ai.expand'), icon: Maximize2, category: 'creative' },
+    { id: 'shorten', label: t('ai.shorten'), icon: Minimize2, category: 'creative' },
+  ];
+
+  const TONES = [
+    t('ai.tones.professional'), t('ai.tones.friendly'),
+    t('ai.tones.academic'), t('ai.tones.sales'), t('ai.tones.creative'),
+  ];
+  const PERSONAS = [
+    { id: 'general', label: t('ai.personas.general') },
+    { id: 'it', label: t('ai.personas.it') },
+    { id: 'sales', label: t('ai.personas.sales') },
+    { id: 'academic', label: t('ai.personas.academic') },
+  ];
   const [showToneDropdown, setShowToneDropdown] = useState(false);
   const [showPersonaDropdown, setShowPersonaDropdown] = useState(false);
 
@@ -85,7 +90,7 @@ export default function AIToolbar({ editor, onResult, onError, onLoading }) {
     <div className="ai-toolbar">
       <div className="ai-toolbar-section">
         <div className="ai-toolbar-badge">
-          <Sparkles size={14} /> AI Tools
+          <Sparkles size={14} /> {t('ai.tools')}
         </div>
         
         {AI_TOOLS.map(tool => {
@@ -99,7 +104,7 @@ export default function AIToolbar({ editor, onResult, onError, onLoading }) {
 
         <div className="ai-dropdown-wrapper">
           <button className="ai-tb-btn" onClick={() => setShowToneDropdown(!showToneDropdown)}>
-            <Palette size={14} /> <span>Tone</span> <ChevronDown size={14} />
+            <Palette size={14} /> <span>{t('ai.tone')}</span> <ChevronDown size={14} />
           </button>
           {showToneDropdown && (
             <div className="ai-dropdown-menu">
@@ -118,7 +123,7 @@ export default function AIToolbar({ editor, onResult, onError, onLoading }) {
           <button 
              className="ai-tb-btn persona-btn" 
              onClick={() => setShowPersonaDropdown(!showPersonaDropdown)}
-             title="Change AI Persona"
+             title={t('ai.changePersona')}
           >
             <div className={`persona-indicator ${settings.activePersona !== 'general' ? 'active' : ''}`} />
             <span>{activePersonaLabel}</span> <ChevronDown size={14} />
@@ -126,7 +131,7 @@ export default function AIToolbar({ editor, onResult, onError, onLoading }) {
           
           {showPersonaDropdown && (
             <div className="ai-dropdown-menu right-aligned">
-              <div className="dropdown-title">Select Persona</div>
+              <div className="dropdown-title">{t('ai.selectPersona')}</div>
               {PERSONAS.map(p => {
                 const isActive = (settings.activePersona || 'general') === p.id;
                 const isPro = p.id !== 'general';

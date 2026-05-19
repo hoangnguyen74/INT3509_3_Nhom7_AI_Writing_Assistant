@@ -2,6 +2,7 @@
 // AI Panel — 4-section AI workspace
 // ========================================
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Sparkles, Rocket, Languages, MessageCircle,
   AlertCircle, Settings,
@@ -9,17 +10,20 @@ import {
 import AICompose from './AICompose';
 import AITranslate from './AITranslate';
 import AIChat from './AIChat';
+import { getActiveProviderInfo } from '../../services/ai';
 import './AIPanel.css';
 
-const SECTIONS = [
-  { id: 'compose', label: 'Compose', icon: Rocket },
-  { id: 'translate', label: 'Translate', icon: Languages },
-  { id: 'chat', label: 'Chat', icon: MessageCircle },
-];
-
-export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
+export default function AIPanel({ editor, aiStatus, onOpenSettings }) {
+  const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState('compose');
-  const isReady = groqStatus?.running;
+
+  const SECTIONS = [
+    { id: 'compose', label: t('compose.compose'), icon: Rocket },
+    { id: 'translate', label: t('translate.translate'), icon: Languages },
+    { id: 'chat', label: t('chat.chat'), icon: MessageCircle },
+  ];
+  const isReady = aiStatus?.running;
+  const { config: providerConfig } = getActiveProviderInfo();
 
   return (
     <div className="ai-panel">
@@ -29,12 +33,12 @@ export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
           <div className="ai-panel__title-icon">
             <Sparkles />
           </div>
-          AI Assistant
+          {t('ai.assistant')}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div className={`ai-panel__status ${isReady ? 'ai-panel__status--online' : 'ai-panel__status--offline'}`}>
             <span className={`status-dot ${isReady ? 'status-dot--online' : 'status-dot--offline'}`}></span>
-            {isReady ? 'Llama 3' : 'No Key'}
+            {isReady ? `${providerConfig?.icon || '⚡'} ${providerConfig?.name || 'AI'}` : t('ai.notConnected')}
           </div>
           <button
             className="ai-panel__settings-btn"
@@ -71,14 +75,11 @@ export default function AIPanel({ editor, groqStatus, onOpenSettings }) {
           <div className="ai-panel__no-key">
             <AlertCircle size={16} />
             <span>
-              Set your Groq API key in{' '}
+              {t('ai.configureProvider')}{' '}
               <button onClick={onOpenSettings} className="ai-panel__key-link">
-                ⚙️ Settings
+                ⚙️ {t('ai.settings')}
               </button>
-              {' '}to enable AI features.{' '}
-              <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
-                Get a free key →
-              </a>
+              {' '}{t('ai.enableFeatures')}
             </span>
           </div>
         )}

@@ -2,25 +2,27 @@
 // Onboarding Flow — First-time User Guide
 // ========================================
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   PenLine, Sparkles, Key, ArrowRight, ArrowLeft,
   CheckCircle, ExternalLink, Eye, EyeOff, Loader2,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
-import { checkGroqStatus, setApiKey, getApiKey } from '../../services/groq';
+import { checkAIStatus, getAISettings, updateAISettings } from '../../services/ai';
 import './OnboardingFlow.css';
 
-const STEPS = [
-  { id: 'welcome', title: 'Welcome' },
-  { id: 'apikey', title: 'API Key Setup' },
-  { id: 'tour', title: 'Quick Tour' },
-  { id: 'ready', title: 'Ready!' },
-];
-
 export default function OnboardingFlow({ onComplete }) {
+  const { t } = useTranslation();
   const { updateSettings } = useApp();
+
+  const STEPS = [
+    { id: 'welcome', title: t('onboarding.welcome') },
+    { id: 'apikey', title: t('onboarding.apiKeySetup') },
+    { id: 'tour', title: t('onboarding.quickTour') },
+    { id: 'ready', title: t('onboarding.ready') },
+  ];
   const [currentStep, setCurrentStep] = useState(0);
-  const [apiKey, setLocalApiKey] = useState(getApiKey());
+  const [apiKey, setLocalApiKey] = useState(getAISettings().providers.groq.apiKey);
   const [showKey, setShowKey] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
@@ -29,18 +31,17 @@ export default function OnboardingFlow({ onComplete }) {
     if (!apiKey.trim()) return;
     setTesting(true);
     setTestResult(null);
-    const oldKey = getApiKey();
-    setApiKey(apiKey);
-    const status = await checkGroqStatus();
+    updateAISettings({ providers: { groq: { apiKey } } });
+    const status = await checkAIStatus('groq');
     if (!status.running) {
-      setApiKey(oldKey);
+      updateAISettings({ providers: { groq: { apiKey: '' } } });
     }
     setTestResult(status);
     setTesting(false);
   };
 
   const handleSaveApiKey = async () => {
-    setApiKey(apiKey);
+    updateAISettings({ activeProvider: 'groq', providers: { groq: { apiKey } } });
     await updateSettings({ groqApiKey: apiKey });
   };
 
@@ -104,30 +105,30 @@ export default function OnboardingFlow({ onComplete }) {
               <div className="onboarding__welcome-icon">
                 <PenLine size={40} />
               </div>
-              <h2>Welcome to Write<span className="gradient-text">AI</span>! 🎉</h2>
+              <h2>{t('onboarding.welcomeTitle')}</h2>
               <p className="onboarding__subtitle">
-                Your intelligent writing companion, powered by AI to help you write better, faster, and smarter.
+                {t('onboarding.welcomeSubtitle')}
               </p>
               <div className="onboarding__features">
                 <div className="onboarding__feature-card">
                   <span>✨</span>
                   <div>
-                    <strong>12+ AI Tools</strong>
-                    <p>Summarize, grammar check, translate, rewrite, and more</p>
+                    <strong>{t('onboarding.feature1')}</strong>
+                    <p>{t('onboarding.feature1Desc')}</p>
                   </div>
                 </div>
                 <div className="onboarding__feature-card">
                   <span>📝</span>
                   <div>
-                    <strong>Rich Text Editor</strong>
-                    <p>Full-featured editor with formatting, tables, and images</p>
+                    <strong>{t('onboarding.feature2')}</strong>
+                    <p>{t('onboarding.feature2Desc')}</p>
                   </div>
                 </div>
                 <div className="onboarding__feature-card">
                   <span>🔒</span>
                   <div>
-                    <strong>Privacy First</strong>
-                    <p>Your documents stay on your device, never stored on our servers</p>
+                    <strong>{t('onboarding.feature3')}</strong>
+                    <p>{t('onboarding.feature3Desc')}</p>
                   </div>
                 </div>
               </div>
@@ -140,20 +141,20 @@ export default function OnboardingFlow({ onComplete }) {
               <div className="onboarding__step-icon">
                 <Key size={32} />
               </div>
-              <h2>Set Up Your AI Engine</h2>
+              <h2>{t('onboarding.setupTitle')}</h2>
               <p className="onboarding__subtitle">
-                WriteAI uses <strong>Groq</strong> (free) for AI processing. Follow these steps to get your API key:
+                {t('onboarding.setupSubtitle')}
               </p>
 
               <div className="onboarding__instructions">
                 <div className="onboarding__instruction">
                   <span className="onboarding__instruction-num">1</span>
                   <div>
-                    <strong>Create a free Groq account</strong>
+                    <strong>{t('onboarding.step1')}</strong>
                     <p>
                       Visit{' '}
                       <a href="https://console.groq.com" target="_blank" rel="noreferrer">
-                        console.groq.com <ExternalLink size={12} />
+                        {t('onboarding.step1Link')} <ExternalLink size={12} />
                       </a>
                     </p>
                   </div>
@@ -161,11 +162,10 @@ export default function OnboardingFlow({ onComplete }) {
                 <div className="onboarding__instruction">
                   <span className="onboarding__instruction-num">2</span>
                   <div>
-                    <strong>Go to API Keys</strong>
+                    <strong>{t('onboarding.step2')}</strong>
                     <p>
-                      Navigate to{' '}
                       <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
-                        API Keys section <ExternalLink size={12} />
+                        {t('onboarding.step2Link')} <ExternalLink size={12} />
                       </a>
                     </p>
                   </div>
@@ -173,8 +173,8 @@ export default function OnboardingFlow({ onComplete }) {
                 <div className="onboarding__instruction">
                   <span className="onboarding__instruction-num">3</span>
                   <div>
-                    <strong>Create a new key & paste below</strong>
-                    <p>Click "Create API Key", copy it, and paste here:</p>
+                    <strong>{t('onboarding.step3')}</strong>
+                    <p>{t('onboarding.step3Desc')}</p>
                   </div>
                 </div>
               </div>
@@ -200,21 +200,21 @@ export default function OnboardingFlow({ onComplete }) {
                   onClick={handleTestApiKey}
                   disabled={!apiKey.trim() || testing}
                 >
-                  {testing ? <Loader2 size={14} className="auth-spinner" /> : '🔌'} Test
+                  {testing ? <Loader2 size={14} className="auth-spinner" /> : '🔌'} {t('onboarding.test')}
                 </button>
               </div>
 
               {testResult && (
                 <div className={`onboarding__test-result ${testResult.running ? 'success' : 'error'}`}>
                   {testResult.running
-                    ? '✅ Connected! Your API key is working.'
-                    : `❌ ${testResult.error || 'Connection failed. Please check your key.'}`
+                    ? `✅ ${t('onboarding.testSuccess')}`
+                    : `❌ ${testResult.error || t('onboarding.testFailed')}`
                   }
                 </div>
               )}
 
               <p className="onboarding__hint">
-                💡 You can always change this later in Settings. Your key is stored securely in your account.
+                💡 {t('onboarding.keyHint')}
               </p>
             </div>
           )}
@@ -225,32 +225,32 @@ export default function OnboardingFlow({ onComplete }) {
               <div className="onboarding__step-icon">
                 <Sparkles size={32} />
               </div>
-              <h2>How It Works</h2>
+              <h2>{t('onboarding.tourTitle')}</h2>
               <p className="onboarding__subtitle">
-                Here's a quick overview of your workspace:
+                {t('onboarding.tourSubtitle')}
               </p>
 
               <div className="onboarding__tour-grid">
                 <div className="onboarding__tour-card">
-                  <div className="onboarding__tour-card-header">📁 Sidebar</div>
-                  <p>Manage your documents — create, search, favorite, and organize.</p>
+                  <div className="onboarding__tour-card-header">📁 {t('onboarding.tourSidebar')}</div>
+                  <p>{t('onboarding.tourSidebarDesc')}</p>
                 </div>
                 <div className="onboarding__tour-card">
-                  <div className="onboarding__tour-card-header">📝 Editor</div>
-                  <p>Write with a powerful rich text editor. Bold, lists, tables, and more.</p>
+                  <div className="onboarding__tour-card-header">📝 {t('onboarding.tourEditor')}</div>
+                  <p>{t('onboarding.tourEditorDesc')}</p>
                 </div>
                 <div className="onboarding__tour-card">
-                  <div className="onboarding__tour-card-header">🤖 AI Panel</div>
-                  <p>Use AI tools: summarize, grammar check, translate, compose, chat.</p>
+                  <div className="onboarding__tour-card-header">🤖 {t('onboarding.tourAI')}</div>
+                  <p>{t('onboarding.tourAIDesc')}</p>
                 </div>
                 <div className="onboarding__tour-card">
-                  <div className="onboarding__tour-card-header">✨ Inline AI</div>
-                  <p>Select any text in the editor and an AI menu appears for quick actions.</p>
+                  <div className="onboarding__tour-card-header">✨ {t('onboarding.tourInline')}</div>
+                  <p>{t('onboarding.tourInlineDesc')}</p>
                 </div>
               </div>
 
               <div className="onboarding__tip">
-                <strong>💡 Pro tip:</strong> Use <kbd>Ctrl+F</kbd> to open Find &amp; Replace — search and update text across your document instantly!
+                <strong>💡 {t('onboarding.proTip')}</strong> {t('onboarding.proTipText')}
               </div>
             </div>
           )}
@@ -259,12 +259,12 @@ export default function OnboardingFlow({ onComplete }) {
           {currentStep === 3 && (
             <div className="onboarding__step fade-in">
               <div className="onboarding__ready-icon">🚀</div>
-              <h2>You're All Set!</h2>
+              <h2>{t('onboarding.allSet')}</h2>
               <p className="onboarding__subtitle">
-                Your workspace is ready. Start writing and let AI help you create amazing content.
+                {t('onboarding.allSetDesc')}
               </p>
               <button className="onboarding__start-btn" onClick={handleFinish}>
-                Start Writing
+                {t('onboarding.startWriting')}
                 <ArrowRight size={18} />
               </button>
             </div>
@@ -274,18 +274,18 @@ export default function OnboardingFlow({ onComplete }) {
         {/* Navigation */}
         <div className="onboarding__nav">
           <button className="onboarding__skip" onClick={handleSkip}>
-            Skip setup
+            {t('onboarding.skipSetup')}
           </button>
           <div className="onboarding__nav-buttons">
             {currentStep > 0 && (
               <button className="onboarding__nav-btn onboarding__nav-btn--back" onClick={handleBack}>
                 <ArrowLeft size={16} />
-                Back
+                {t('onboarding.back')}
               </button>
             )}
             {currentStep < STEPS.length - 1 && (
               <button className="onboarding__nav-btn onboarding__nav-btn--next" onClick={handleNext}>
-                Next
+                {t('onboarding.next')}
                 <ArrowRight size={16} />
               </button>
             )}

@@ -2,6 +2,7 @@
 // Sidebar — Document Management
 // ========================================
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Plus, Search, FileText, Star, Trash2, MoreHorizontal,
   Edit3, StarOff, Trash, RotateCcw, LogOut, ChevronLeft,
@@ -37,6 +38,7 @@ function truncate(str, len = 60) {
 }
 
 export default function Sidebar({ onNewDocument }) {
+  const { t } = useTranslation();
   const {
     user, documents, currentDoc, sidebarOpen,
     setDocuments, setCurrentDoc, setSidebarOpen,
@@ -236,14 +238,14 @@ export default function Sidebar({ onNewDocument }) {
           <button
             className="sidebar__icon-btn"
             onClick={handleSignOut}
-            title="Sign out"
+            title={t('sidebar.signOut')}
           >
             <LogOut size={16} />
           </button>
           <button
             className="sidebar__icon-btn"
             onClick={() => setSidebarOpen(false)}
-            title="Close sidebar"
+            title={t('sidebar.closeSidebar')}
           >
             <ChevronLeft size={16} />
           </button>
@@ -253,7 +255,7 @@ export default function Sidebar({ onNewDocument }) {
       {/* New Document */}
       <button className="sidebar__new-btn" onClick={handleNewDoc}>
         <Plus size={18} />
-        New Document
+        {t('sidebar.newDocument')}
       </button>
 
       {/* Search */}
@@ -261,7 +263,7 @@ export default function Sidebar({ onNewDocument }) {
         <Search size={14} />
         <input
           type="text"
-          placeholder="Search documents..."
+          placeholder={t('sidebar.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -279,21 +281,21 @@ export default function Sidebar({ onNewDocument }) {
           onClick={() => setTab('all')}
         >
           <FileText size={14} />
-          All
+          {t('sidebar.tabAll')}
         </button>
         <button
           className={`sidebar__tab ${tab === 'favorites' ? 'sidebar__tab--active' : ''}`}
           onClick={() => setTab('favorites')}
         >
           <Star size={14} />
-          Favorites
+          {t('sidebar.tabFavorites')}
         </button>
         <button
           className={`sidebar__tab ${tab === 'trash' ? 'sidebar__tab--active' : ''}`}
           onClick={() => setTab('trash')}
         >
           <Trash2 size={14} />
-          Trash
+          {t('sidebar.tabTrash')}
         </button>
       </div>
 
@@ -304,24 +306,24 @@ export default function Sidebar({ onNewDocument }) {
             {tab === 'trash' ? (
               <>
                 <Trash2 size={32} />
-                <p>Trash is empty</p>
+                <p>{t('sidebar.emptyTrash')}</p>
               </>
             ) : searchQuery ? (
               <>
                 <Search size={32} />
-                <p>No documents found</p>
+                <p>{t('sidebar.emptySearch')}</p>
               </>
             ) : tab === 'favorites' ? (
               <>
                 <Star size={32} />
-                <p>No favorites yet</p>
-                <span>Right-click a document to add to favorites</span>
+                <p>{t('sidebar.emptyFavorites')}</p>
+                <span>{t('sidebar.emptyFavoritesHint')}</span>
               </>
             ) : (
               <>
                 <FileText size={32} />
-                <p>No documents yet</p>
-                <span>Click "New Document" to get started</span>
+                <p>{t('sidebar.emptyAll')}</p>
+                <span>{t('sidebar.emptyAllHint')}</span>
               </>
             )}
           </div>
@@ -352,7 +354,7 @@ export default function Sidebar({ onNewDocument }) {
                     onClick={(e) => e.stopPropagation()}
                   />
                 ) : (
-                  <span className="sidebar__doc-title">{doc.title || 'Untitled'}</span>
+                  <span className="sidebar__doc-title">{doc.title || t('dashboard.untitled')}</span>
                 )}
                 <span className="sidebar__doc-meta">
                   <Clock size={10} />
@@ -365,14 +367,14 @@ export default function Sidebar({ onNewDocument }) {
                   <button
                     className="sidebar__icon-btn sidebar__icon-btn--small"
                     onClick={(e) => { e.stopPropagation(); handleRestore(doc.id); }}
-                    title="Restore"
+                    title={t('sidebar.restore')}
                   >
                     <RotateCcw size={13} />
                   </button>
                   <button
                     className="sidebar__icon-btn sidebar__icon-btn--small sidebar__icon-btn--danger"
                     onClick={(e) => { e.stopPropagation(); handlePermanentDelete(doc.id); }}
-                    title="Delete forever"
+                    title={t('sidebar.deletePermanently')}
                   >
                     <Trash size={13} />
                   </button>
@@ -397,14 +399,14 @@ export default function Sidebar({ onNewDocument }) {
           {confirmEmpty ? (
             <div className="sidebar__confirm">
               <AlertTriangle size={14} />
-              <span>Delete all permanently?</span>
+              <span>{t('sidebar.emptyTrashConfirm')}</span>
               <button onClick={handleEmptyTrash} className="sidebar__confirm-yes">Yes</button>
               <button onClick={() => setConfirmEmpty(false)} className="sidebar__confirm-no">No</button>
             </div>
           ) : (
             <button className="sidebar__empty-trash-btn" onClick={() => setConfirmEmpty(true)}>
               <Trash2 size={14} />
-              Empty Trash
+              {t('sidebar.emptyTrashBtn')}
             </button>
           )}
         </div>
@@ -420,13 +422,13 @@ export default function Sidebar({ onNewDocument }) {
         >
           <button onClick={() => handleStartRename(documents.find(d => d.id === contextMenu.docId))}>
             <Edit3 size={14} />
-            Rename
+            {t('sidebar.rename')}
           </button>
           <button onClick={() => handleToggleFavorite(contextMenu.docId)}>
             {documents.find(d => d.id === contextMenu.docId)?.isFavorite ? (
-              <><StarOff size={14} /> Unfavorite</>
+              <><StarOff size={14} /> {t('sidebar.unfavorite')}</>
             ) : (
-              <><Star size={14} /> Favorite</>
+              <><Star size={14} /> {t('sidebar.favorite')}</>
             )}
           </button>
           <div className="sidebar__context-divider" />
@@ -435,7 +437,7 @@ export default function Sidebar({ onNewDocument }) {
             onClick={() => handleDelete(contextMenu.docId)}
           >
             <Trash size={14} />
-            Move to Trash
+            {t('sidebar.moveToTrash')}
           </button>
         </div>
       )}

@@ -286,6 +286,41 @@
   font-weight: 500;
 }
 
+.statusbar-grammar-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 11px;
+  transition: all var(--transition-fast);
+}
+
+.statusbar-grammar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.statusbar-grammar-btn--active {
+  color: var(--primary-600);
+  border-color: var(--primary-300);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.statusbar-grammar-count {
+  font-size: 10px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 /* ========== Print Styles ========== */
 @media print {
   .app-header, .sidebar, .ai-panel-wrapper, .editor-toolbar-container,

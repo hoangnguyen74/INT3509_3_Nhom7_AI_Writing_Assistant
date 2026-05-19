@@ -2,40 +2,42 @@
 // AI Compose — Generate content from prompts
 // ========================================
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Send, Copy, Check, ArrowDownToLine, Loader2, AlertCircle,
   FileText, ListChecks, ChevronRight
 } from 'lucide-react';
-import { compose, continueWriting, generateOutline } from '../../services/groq';
+import { compose, continueWriting, generateOutline } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
 
-const CONTENT_TYPES = [
-  { id: 'email', label: '📧 Email' },
-  { id: 'blog', label: '📝 Blog Post' },
-  { id: 'essay', label: '📄 Essay' },
-  { id: 'report', label: '📊 Report' },
-  { id: 'letter', label: '✉️ Letter' },
-  { id: 'social', label: '📱 Social Media' },
-  { id: 'story', label: '📖 Story' },
-  { id: 'review', label: '⭐ Review' },
-];
-
-const TONES = [
-  { id: '', label: 'Auto' },
-  { id: 'formal', label: 'Formal' },
-  { id: 'friendly', label: 'Friendly' },
-  { id: 'professional', label: 'Professional' },
-  { id: 'creative', label: 'Creative' },
-];
-
-const LANGUAGES = [
-  { id: 'auto', label: '🌐 Auto' },
-  { id: 'en', label: '🇬🇧 English' },
-  { id: 'vi', label: '🇻🇳 Vietnamese' },
-];
-
 export default function AICompose({ editor, isReady }) {
+  const { t } = useTranslation();
   const { checkApiQuota, openPaywall, settings } = useApp();
+
+  const CONTENT_TYPES = [
+    { id: 'email', label: `📧 ${t('compose.types.email')}` },
+    { id: 'blog', label: `📝 ${t('compose.types.blog')}` },
+    { id: 'essay', label: `📄 ${t('compose.types.essay')}` },
+    { id: 'report', label: `📊 ${t('compose.types.report')}` },
+    { id: 'letter', label: `✉️ ${t('compose.types.letter')}` },
+    { id: 'social', label: `📱 ${t('compose.types.social')}` },
+    { id: 'story', label: `📖 ${t('compose.types.story')}` },
+    { id: 'review', label: `⭐ ${t('compose.types.review')}` },
+  ];
+
+  const TONES = [
+    { id: '', label: t('compose.auto') },
+    { id: 'formal', label: 'Formal' },
+    { id: 'friendly', label: t('ai.tones.friendly') },
+    { id: 'professional', label: t('ai.tones.professional') },
+    { id: 'creative', label: t('ai.tones.creative') },
+  ];
+
+  const LANGUAGES = [
+    { id: 'auto', label: `🌐 ${t('compose.auto')}` },
+    { id: 'en', label: `🇬🇧 ${t('language.en')}` },
+    { id: 'vi', label: `🇻🇳 ${t('language.vi')}` },
+  ];
   const [prompt, setPrompt] = useState('');
   const [contentType, setContentType] = useState('email');
   const [tone, setTone] = useState('');
@@ -48,7 +50,7 @@ export default function AICompose({ editor, isReady }) {
 
   const handleGenerate = useCallback(async () => {
     if (mode === 'compose' && !prompt.trim()) {
-      setError('Please enter a prompt to generate content.');
+      setError(t('compose.enterPrompt'));
       return;
     }
 
@@ -67,7 +69,7 @@ export default function AICompose({ editor, isReady }) {
       if (mode === 'continue') {
         const text = editor?.state.doc.textContent || '';
         if (!text.trim()) {
-          setError('Write some text in the editor first to continue from.');
+          setError(t('compose.writeFirst'));
           setLoading(false);
           return;
         }
@@ -107,21 +109,21 @@ export default function AICompose({ editor, isReady }) {
           onClick={() => { setMode('compose'); setResult(''); setError(''); }}
         >
           <Send size={14} />
-          Compose
+          {t('compose.compose')}
         </button>
         <button
           className={`compose-mode-tab ${mode === 'continue' ? 'compose-mode-tab--active' : ''}`}
           onClick={() => { setMode('continue'); setResult(''); setError(''); }}
         >
           <ChevronRight size={14} />
-          Continue
+          {t('compose.continue')}
         </button>
         <button
           className={`compose-mode-tab ${mode === 'outline' ? 'compose-mode-tab--active' : ''}`}
           onClick={() => { setMode('outline'); setResult(''); setError(''); }}
         >
           <ListChecks size={14} />
-          Outline
+          {t('compose.outline')}
         </button>
       </div>
 
@@ -129,7 +131,7 @@ export default function AICompose({ editor, isReady }) {
       {mode !== 'continue' && (
         <div className="compose-field">
           <label className="compose-label">
-            {mode === 'outline' ? 'Topic' : 'Describe what you want to write'}
+            {mode === 'outline' ? t('compose.topicLabel') : t('compose.promptLabel')}
           </label>
           <textarea
             className="compose-textarea"
@@ -137,8 +139,8 @@ export default function AICompose({ editor, isReady }) {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={
               mode === 'outline'
-                ? 'e.g., Climate change impact on agriculture...'
-                : 'e.g., Write a follow-up email to a client about the project deadline...'
+                ? t('compose.topicPlaceholder')
+                : t('compose.promptPlaceholder')
             }
             rows={3}
           />
@@ -148,7 +150,7 @@ export default function AICompose({ editor, isReady }) {
       {/* Content Type */}
       {mode !== 'continue' && (
         <div className="compose-field">
-          <label className="compose-label">Content Type</label>
+          <label className="compose-label">{t('compose.contentType')}</label>
           <div className="compose-type-grid">
             {CONTENT_TYPES.map(type => (
               <button
@@ -167,7 +169,7 @@ export default function AICompose({ editor, isReady }) {
       {mode === 'compose' && (
         <div className="compose-row">
           <div className="compose-field compose-field--half">
-            <label className="compose-label">Tone</label>
+            <label className="compose-label">{t('compose.toneLabel')}</label>
             <select
               className="compose-select"
               value={tone}
@@ -179,7 +181,7 @@ export default function AICompose({ editor, isReady }) {
             </select>
           </div>
           <div className="compose-field compose-field--half">
-            <label className="compose-label">Language</label>
+            <label className="compose-label">{t('compose.languageLabel')}</label>
             <select
               className="compose-select"
               value={language}
@@ -196,7 +198,7 @@ export default function AICompose({ editor, isReady }) {
       {/* Continue mode info */}
       {mode === 'continue' && (
         <p className="compose-info">
-          💡 AI will continue writing from where your text ends. The current editor content will be used as context.
+          💡 {t('compose.continueInfo')}
         </p>
       )}
 
@@ -207,12 +209,12 @@ export default function AICompose({ editor, isReady }) {
         disabled={loading || !isReady}
       >
         {loading ? (
-          <><Loader2 size={16} className="wt-spinner" /> Generating...</>
+          <><Loader2 size={16} className="wt-spinner" /> {t('compose.generating')}</>
         ) : (
           <>
-            {mode === 'compose' && <><Send size={16} /> Generate</>}
-            {mode === 'continue' && <><ChevronRight size={16} /> Continue Writing</>}
-            {mode === 'outline' && <><ListChecks size={16} /> Generate Outline</>}
+            {mode === 'compose' && <><Send size={16} /> {t('compose.generate')}</>}
+            {mode === 'continue' && <><ChevronRight size={16} /> {t('compose.continueWriting')}</>}
+            {mode === 'outline' && <><ListChecks size={16} /> {t('compose.generateOutline')}</>}
           </>
         )}
       </button>
@@ -229,15 +231,15 @@ export default function AICompose({ editor, isReady }) {
       {result && (
         <div className="wt-result fade-in">
           <div className="wt-result__header">
-            <span className="wt-result__label">✨ Generated Content</span>
+            <span className="wt-result__label">✨ {t('compose.generatedContent')}</span>
             <div className="wt-result__actions">
               <button className="wt-action-btn" onClick={handleCopy}>
                 {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? t('compose.copied') : t('compose.copy')}
               </button>
               <button className="wt-action-btn wt-action-btn--primary" onClick={handleInsert}>
                 <ArrowDownToLine size={13} />
-                Insert
+                {t('compose.insert')}
               </button>
             </div>
           </div>
