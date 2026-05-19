@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   X, Eye, EyeOff, Key, Check, Loader2, RefreshCw,
-  ExternalLink, Zap, Globe, HardDrive
+  ExternalLink, Zap, Globe, HardDrive, BookOpen
 } from 'lucide-react';
 import {
   getAISettings, updateAISettings, checkAIStatus,
@@ -18,6 +18,111 @@ const PROVIDER_ICONS = {
   gemini: Globe,
   ollama: HardDrive,
 };
+
+function SetupGuide({ providerId, t }) {
+  if (providerId === 'groq') {
+    return (
+      <div className="settings-setup-guide">
+        <div className="settings-setup-guide__title">
+          <BookOpen size={14} /> {t('settings.guide.title')}
+        </div>
+        <div className="settings-setup-guide__steps">
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">1</span>
+            <p>
+              {t('settings.guide.groq.step1')}{' '}
+              <a href="https://console.groq.com" target="_blank" rel="noreferrer">
+                console.groq.com <ExternalLink size={11} />
+              </a>
+            </p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">2</span>
+            <p>
+              {t('settings.guide.groq.step2')}{' '}
+              <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
+                API Keys <ExternalLink size={11} />
+              </a>
+            </p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">3</span>
+            <p>{t('settings.guide.groq.step3')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (providerId === 'gemini') {
+    return (
+      <div className="settings-setup-guide">
+        <div className="settings-setup-guide__title">
+          <BookOpen size={14} /> {t('settings.guide.title')}
+        </div>
+        <div className="settings-setup-guide__steps">
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">1</span>
+            <p>
+              {t('settings.guide.gemini.step1')}{' '}
+              <a href="https://aistudio.google.com" target="_blank" rel="noreferrer">
+                Google AI Studio <ExternalLink size={11} />
+              </a>
+            </p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">2</span>
+            <p>
+              {t('settings.guide.gemini.step2')}{' '}
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">
+                Get API Key <ExternalLink size={11} />
+              </a>
+            </p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">3</span>
+            <p>{t('settings.guide.gemini.step3')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (providerId === 'ollama') {
+    return (
+      <div className="settings-setup-guide">
+        <div className="settings-setup-guide__title">
+          <BookOpen size={14} /> {t('settings.guide.title')}
+        </div>
+        <div className="settings-setup-guide__steps">
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">1</span>
+            <p>
+              {t('settings.guide.ollama.step1')}{' '}
+              <a href="https://ollama.com/download" target="_blank" rel="noreferrer">
+                ollama.com <ExternalLink size={11} />
+              </a>
+            </p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">2</span>
+            <p>{t('settings.guide.ollama.step2')} <code>ollama pull llama3.1</code></p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">3</span>
+            <p>{t('settings.guide.ollama.step3')} <code>ollama serve</code></p>
+          </div>
+          <div className="settings-setup-guide__step">
+            <span className="settings-setup-guide__num">4</span>
+            <p>{t('settings.guide.ollama.step4')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export default function SettingsModal({ isOpen, onClose, onSave }) {
   const { t } = useTranslation();
@@ -59,7 +164,6 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
   const handleTest = useCallback(async () => {
     setTesting(true);
     setTestResult(null);
-    // Temporarily save to test
     updateAISettings({
       activeProvider: activeTab,
       providers: { [activeTab]: settings.providers[activeTab] },
@@ -133,9 +237,12 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
             </div>
           </div>
 
+          {/* Setup Guide */}
+          <SetupGuide providerId={activeTab} t={t} />
+
           {/* API Key (Groq & Gemini) */}
           {config.requiresApiKey && (
-            <>
+            <div className="settings-form-section">
               <label className="settings-label">
                 <Key size={14} />
                 {t('settings.apiKey')}
@@ -162,12 +269,12 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
                   {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {/* Ollama Base URL */}
           {activeTab === 'ollama' && (
-            <>
+            <div className="settings-form-section">
               <label className="settings-label">
                 <HardDrive size={14} />
                 {t('settings.ollamaUrl')}
@@ -192,39 +299,41 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
                   <RefreshCw size={16} className={loadingModels ? 'wt-spinner' : ''} />
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {/* Model Selection */}
-          <label className="settings-label" style={{ marginTop: 16 }}>
-            {t('settings.model')}
-          </label>
-          {activeTab === 'ollama' ? (
-            <select
-              className="settings-select"
-              value={providerSettings.model || ''}
-              onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
-            >
-              <option value="">
-                {loadingModels ? t('settings.loadingModels') : ollamaModels.length === 0 ? t('settings.noModels') : t('settings.selectModel')}
-              </option>
-              {ollamaModels.map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
-          ) : (
-            <select
-              className="settings-select"
-              value={providerSettings.model || getProviderSettings(activeTab).model || ''}
-              onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
-            >
-              {config.models.map(m => (
-                <option key={m.id} value={m.id}>
-                  {m.name}{m.default ? ` ${t('settings.default')}` : ''}
+          <div className="settings-form-section">
+            <label className="settings-label">
+              {t('settings.model')}
+            </label>
+            {activeTab === 'ollama' ? (
+              <select
+                className="settings-select"
+                value={providerSettings.model || ''}
+                onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
+              >
+                <option value="">
+                  {loadingModels ? t('settings.loadingModels') : ollamaModels.length === 0 ? t('settings.noModels') : t('settings.selectModel')}
                 </option>
-              ))}
-            </select>
-          )}
+                {ollamaModels.map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            ) : (
+              <select
+                className="settings-select"
+                value={providerSettings.model || getProviderSettings(activeTab).model || ''}
+                onChange={e => updateProviderField(activeTab, 'model', e.target.value)}
+              >
+                {config.models.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}{m.default ? ` ${t('settings.default')}` : ''}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
 
           {/* Test Result */}
           {testResult && (

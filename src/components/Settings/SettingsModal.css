@@ -3,15 +3,15 @@
    ======================================== */
 
 .settings-modal--wide {
-  max-width: 520px;
+  max-width: 680px;
   width: 95vw;
 }
 
 /* Provider Tabs */
 .settings-provider-tabs {
   display: flex;
-  gap: 4px;
-  padding: 0 20px;
+  gap: 0;
+  padding: 0 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-secondary);
 }
@@ -19,8 +19,8 @@
 .settings-provider-tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 8px;
+  padding: 14px 20px;
   border: none;
   background: none;
   color: var(--text-secondary);
@@ -44,7 +44,7 @@
 
 .active-badge {
   font-size: 10px;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 10px;
   background: var(--success-bg, #dcfce7);
   color: var(--success-text, #166534);
@@ -61,34 +61,118 @@
 .settings-provider-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 14px;
+  padding: 16px;
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .settings-provider-icon {
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1;
 }
 
 .settings-provider-info strong {
   display: block;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--text-primary);
 }
 
 .settings-provider-info p {
   margin: 2px 0 0;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   color: var(--text-secondary);
+}
+
+/* Setup Guide */
+.settings-setup-guide {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(59, 130, 246, 0.04);
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .settings-setup-guide {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.15);
+}
+
+.settings-setup-guide__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-setup-guide__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-setup-guide__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.settings-setup-guide__num {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: var(--primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.settings-setup-guide__step p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.settings-setup-guide__step a {
+  color: var(--primary-500);
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.settings-setup-guide__step code {
+  padding: 1px 6px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+/* Form Section */
+.settings-form-section {
+  margin-bottom: 16px;
+}
+
+.settings-form-section .settings-label {
+  margin-bottom: 6px;
 }
 
 /* Select */
 .settings-select {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-primary);
@@ -122,7 +206,7 @@
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -140,8 +224,10 @@
 /* Actions row spacing */
 .settings-modal__actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }

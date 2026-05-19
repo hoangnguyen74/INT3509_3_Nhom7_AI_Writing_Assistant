@@ -23,17 +23,17 @@ export const PROVIDER_CONFIG = {
   gemini: {
     id: 'gemini',
     name: 'Google Gemini',
-    description: 'Free tier with Gemini & Gemma models',
+    description: 'Free API with Gemma 4 & Gemini models',
     icon: '🔮',
     requiresApiKey: true,
     apiKeyPlaceholder: 'AI...',
     apiKeyUrl: 'https://aistudio.google.com/apikey',
     apiKeyLabel: 'Google AI Studio',
     models: [
-      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', default: true },
+      { id: 'gemma-4-31b-it', name: 'Gemma 4 31B (Free)', default: true },
+      { id: 'gemma-4-26b-a4b-it', name: 'Gemma 4 26B MoE (Free)' },
+      { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
       { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite' },
-      { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-      { id: 'gemma-3-27b-it', name: 'Gemma 3 27B' },
     ],
   },
   ollama: {

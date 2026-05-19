@@ -255,11 +255,30 @@
     "selectModel": "Select a model",
     "getFreeKey": "Get a free key from",
     "connected": "Connected to {{provider}}! Model: {{model}}",
-    "default": "(Default)"
+    "default": "(Default)",
+    "guide": {
+      "title": "Setup Guide",
+      "groq": {
+        "step1": "Create a free account at",
+        "step2": "Navigate to API Keys and create a new key at",
+        "step3": "Copy the key (starts with gsk_) and paste it below."
+      },
+      "gemini": {
+        "step1": "Sign in with your Google account at",
+        "step2": "Click \"Get API Key\" to generate a free key at",
+        "step3": "Copy the key and paste it below. Gemma 4 models are completely free!"
+      },
+      "ollama": {
+        "step1": "Download and install Ollama from",
+        "step2": "Open terminal and pull a model, e.g.",
+        "step3": "Start the server with",
+        "step4": "Click \"Refresh models\" above to see your installed models."
+      }
+    }
   },
   "onboarding": {
     "welcome": "Welcome",
-    "apiKeySetup": "API Key Setup",
+    "providerSetup": "AI Provider",
     "quickTour": "Quick Tour",
     "ready": "Ready!",
     "welcomeTitle": "Welcome to WriteAI!",
@@ -270,18 +289,37 @@
     "feature2Desc": "Full-featured editor with formatting, tables, and images",
     "feature3": "Privacy First",
     "feature3Desc": "Your documents stay on your device, never stored on our servers",
-    "setupTitle": "Set Up Your AI Engine",
-    "setupSubtitle": "WriteAI uses Groq (free) for AI processing. Follow these steps to get your API key:",
-    "step1": "Create a free Groq account",
-    "step1Link": "console.groq.com",
-    "step2": "Go to API Keys",
-    "step2Link": "API Keys section",
-    "step3": "Create a new key & paste below",
-    "step3Desc": "Click \"Create API Key\", copy it, and paste here:",
+    "providerTitle": "Choose Your AI Provider",
+    "providerSubtitle": "WriteAI supports multiple AI providers. Pick one to get started — you can always switch later in Settings.",
+    "provider": {
+      "free": "Free",
+      "groqDesc": "Super fast inference with Llama & Mixtral models",
+      "geminiDesc": "Free Gemma 4 & Gemini models by Google",
+      "ollamaDesc": "Run AI models locally on your machine"
+    },
+    "groq": {
+      "step1": "Create a free Groq account",
+      "step2": "Go to API Keys section",
+      "step3": "Create a new key & paste below",
+      "step3Desc": "Click \"Create API Key\", copy it, and paste here:"
+    },
+    "gemini": {
+      "step1": "Sign in with your Google account",
+      "step2": "Click \"Get API Key\" to generate a free key",
+      "step3": "Copy the key and paste below",
+      "step3Desc": "Gemma 4 models are completely free — no credit card needed!"
+    },
+    "ollama": {
+      "step1": "Download & install Ollama",
+      "step2": "Pull a model via terminal",
+      "step2Desc": "Run: ollama pull llama3.1",
+      "step3": "Start the Ollama server",
+      "step3Desc": "Run: ollama serve (or it may auto-start)"
+    },
     "test": "Test",
-    "testSuccess": "Connected! Your API key is working.",
-    "testFailed": "Connection failed. Please check your key.",
-    "keyHint": "You can always change this later in Settings. You can also choose other providers (Google Gemini, Ollama) in Settings.",
+    "testSuccess": "Connected! Your AI provider is working.",
+    "testFailed": "Connection failed. Please check your setup.",
+    "providerHint": "You can always change your provider later in Settings.",
     "tourTitle": "How It Works",
     "tourSubtitle": "Here's a quick overview of your workspace:",
     "tourSidebar": "Sidebar",

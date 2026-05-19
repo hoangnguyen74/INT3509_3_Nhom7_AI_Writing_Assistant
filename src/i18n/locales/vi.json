@@ -255,11 +255,30 @@
     "selectModel": "Chọn một model",
     "getFreeKey": "Lấy khóa miễn phí từ",
     "connected": "Đã kết nối tới {{provider}}! Model: {{model}}",
-    "default": "(Mặc định)"
+    "default": "(Mặc định)",
+    "guide": {
+      "title": "Hướng dẫn cài đặt",
+      "groq": {
+        "step1": "Tạo tài khoản miễn phí tại",
+        "step2": "Vào mục API Keys và tạo key mới tại",
+        "step3": "Sao chép key (bắt đầu bằng gsk_) và dán vào bên dưới."
+      },
+      "gemini": {
+        "step1": "Đăng nhập bằng tài khoản Google tại",
+        "step2": "Nhấn \"Get API Key\" để tạo key miễn phí tại",
+        "step3": "Sao chép key và dán vào bên dưới. Các model Gemma 4 hoàn toàn miễn phí!"
+      },
+      "ollama": {
+        "step1": "Tải và cài đặt Ollama từ",
+        "step2": "Mở terminal và tải model, ví dụ",
+        "step3": "Khởi động server bằng",
+        "step4": "Nhấn \"Làm mới danh sách model\" ở trên để xem các model đã cài."
+      }
+    }
   },
   "onboarding": {
     "welcome": "Chào mừng",
-    "apiKeySetup": "Thiết lập API Key",
+    "providerSetup": "Nhà cung cấp AI",
     "quickTour": "Hướng dẫn nhanh",
     "ready": "Sẵn sàng!",
     "welcomeTitle": "Chào mừng đến với WriteAI!",
@@ -270,18 +289,37 @@
     "feature2Desc": "Soạn thảo đầy đủ với định dạng, bảng, và hình ảnh",
     "feature3": "Bảo mật trước tiên",
     "feature3Desc": "Tài liệu được lưu trên thiết bị, không bao giờ lưu trên máy chủ",
-    "setupTitle": "Thiết lập AI Engine",
-    "setupSubtitle": "WriteAI sử dụng Groq (miễn phí) để xử lý AI. Làm theo các bước sau để lấy API key:",
-    "step1": "Tạo tài khoản Groq miễn phí",
-    "step1Link": "console.groq.com",
-    "step2": "Vào mục API Keys",
-    "step2Link": "Mục API Keys",
-    "step3": "Tạo key mới và dán vào bên dưới",
-    "step3Desc": "Nhấp \"Create API Key\", sao chép, và dán tại đây:",
+    "providerTitle": "Chọn nhà cung cấp AI",
+    "providerSubtitle": "WriteAI hỗ trợ nhiều nhà cung cấp AI. Chọn một để bắt đầu — bạn có thể đổi sau trong Cài đặt.",
+    "provider": {
+      "free": "Miễn phí",
+      "groqDesc": "Suy luận siêu nhanh với Llama & Mixtral",
+      "geminiDesc": "Gemma 4 & Gemini miễn phí từ Google",
+      "ollamaDesc": "Chạy AI trên máy tính của bạn"
+    },
+    "groq": {
+      "step1": "Tạo tài khoản Groq miễn phí",
+      "step2": "Vào mục API Keys",
+      "step3": "Tạo key mới và dán vào bên dưới",
+      "step3Desc": "Nhấp \"Create API Key\", sao chép, và dán tại đây:"
+    },
+    "gemini": {
+      "step1": "Đăng nhập bằng tài khoản Google",
+      "step2": "Nhấn \"Get API Key\" để tạo key miễn phí",
+      "step3": "Sao chép key và dán vào bên dưới",
+      "step3Desc": "Các model Gemma 4 hoàn toàn miễn phí — không cần thẻ tín dụng!"
+    },
+    "ollama": {
+      "step1": "Tải và cài đặt Ollama",
+      "step2": "Mở terminal và tải model",
+      "step2Desc": "Chạy: ollama pull llama3.1",
+      "step3": "Khởi động server Ollama",
+      "step3Desc": "Chạy: ollama serve (hoặc nó tự khởi động)"
+    },
     "test": "Kiểm tra",
-    "testSuccess": "Đã kết nối! API key hoạt động.",
-    "testFailed": "Kết nối thất bại. Vui lòng kiểm tra lại key.",
-    "keyHint": "Bạn luôn có thể thay đổi sau trong Cài đặt. Bạn cũng có thể chọn nhà cung cấp khác (Google Gemini, Ollama) trong Cài đặt.",
+    "testSuccess": "Đã kết nối! Nhà cung cấp AI hoạt động.",
+    "testFailed": "Kết nối thất bại. Vui lòng kiểm tra lại.",
+    "providerHint": "Bạn luôn có thể đổi nhà cung cấp sau trong Cài đặt.",
     "tourTitle": "Cách hoạt động",
     "tourSubtitle": "Tổng quan nhanh về không gian làm việc:",
     "tourSidebar": "Thanh bên",

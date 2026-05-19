@@ -193,6 +193,107 @@
   margin-top: 4px;
 }
 
+/* Provider Selection Grid */
+.onboarding__provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.onboarding__provider-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-3);
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.onboarding__provider-card:hover {
+  border-color: var(--primary-400);
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.onboarding__provider-card--selected {
+  border-color: var(--primary-500);
+  background: rgba(59, 130, 246, 0.06);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+[data-theme="dark"] .onboarding__provider-card--selected {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.onboarding__provider-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-1);
+}
+
+.onboarding__provider-card strong {
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+}
+
+.onboarding__provider-card p {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.onboarding__provider-card-tags {
+  display: flex;
+  gap: 4px;
+  margin-top: var(--space-1);
+}
+
+.onboarding__provider-tag {
+  font-size: 10px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--bg-hover);
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.onboarding__provider-tag--free {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+[data-theme="dark"] .onboarding__provider-tag--free {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+.onboarding__provider-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--primary-500);
+}
+
+.onboarding__provider-setup {
+  width: 100%;
+  text-align: left;
+}
+
 /* Instructions */
 .onboarding__instructions {
   display: flex;

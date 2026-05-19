@@ -6,10 +6,143 @@ import { useTranslation } from 'react-i18next';
 import {
   PenLine, Sparkles, Key, ArrowRight, ArrowLeft,
   CheckCircle, ExternalLink, Eye, EyeOff, Loader2,
+  Zap, Globe, HardDrive,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
-import { checkAIStatus, getAISettings, updateAISettings } from '../../services/ai';
+import { checkAIStatus, getAISettings, updateAISettings, PROVIDER_CONFIG } from '../../services/ai';
 import './OnboardingFlow.css';
+
+const PROVIDER_OPTIONS = [
+  {
+    id: 'groq',
+    Icon: Zap,
+    color: '#f97316',
+    free: true,
+    tag: 'Fastest',
+  },
+  {
+    id: 'gemini',
+    Icon: Globe,
+    color: '#3b82f6',
+    free: true,
+    tag: 'Gemma 4',
+  },
+  {
+    id: 'ollama',
+    Icon: HardDrive,
+    color: '#8b5cf6',
+    free: true,
+    tag: 'Local',
+  },
+];
+
+function ProviderSetupInstructions({ providerId, t }) {
+  if (providerId === 'groq') {
+    return (
+      <div className="onboarding__instructions">
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">1</span>
+          <div>
+            <strong>{t('onboarding.groq.step1')}</strong>
+            <p>
+              <a href="https://console.groq.com" target="_blank" rel="noreferrer">
+                console.groq.com <ExternalLink size={12} />
+              </a>
+            </p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">2</span>
+          <div>
+            <strong>{t('onboarding.groq.step2')}</strong>
+            <p>
+              <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
+                API Keys <ExternalLink size={12} />
+              </a>
+            </p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">3</span>
+          <div>
+            <strong>{t('onboarding.groq.step3')}</strong>
+            <p>{t('onboarding.groq.step3Desc')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (providerId === 'gemini') {
+    return (
+      <div className="onboarding__instructions">
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">1</span>
+          <div>
+            <strong>{t('onboarding.gemini.step1')}</strong>
+            <p>
+              <a href="https://aistudio.google.com" target="_blank" rel="noreferrer">
+                Google AI Studio <ExternalLink size={12} />
+              </a>
+            </p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">2</span>
+          <div>
+            <strong>{t('onboarding.gemini.step2')}</strong>
+            <p>
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">
+                Get API Key <ExternalLink size={12} />
+              </a>
+            </p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">3</span>
+          <div>
+            <strong>{t('onboarding.gemini.step3')}</strong>
+            <p>{t('onboarding.gemini.step3Desc')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (providerId === 'ollama') {
+    return (
+      <div className="onboarding__instructions">
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">1</span>
+          <div>
+            <strong>{t('onboarding.ollama.step1')}</strong>
+            <p>
+              <a href="https://ollama.com/download" target="_blank" rel="noreferrer">
+                ollama.com <ExternalLink size={12} />
+              </a>
+            </p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">2</span>
+          <div>
+            <strong>{t('onboarding.ollama.step2')}</strong>
+            <p>{t('onboarding.ollama.step2Desc')}</p>
+          </div>
+        </div>
+        <div className="onboarding__instruction">
+          <span className="onboarding__instruction-num">3</span>
+          <div>
+            <strong>{t('onboarding.ollama.step3')}</strong>
+            <p>{t('onboarding.ollama.step3Desc')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export default function OnboardingFlow({ onComplete }) {
   const { t } = useTranslation();
@@ -17,37 +150,63 @@ export default function OnboardingFlow({ onComplete }) {
 
   const STEPS = [
     { id: 'welcome', title: t('onboarding.welcome') },
-    { id: 'apikey', title: t('onboarding.apiKeySetup') },
+    { id: 'provider', title: t('onboarding.providerSetup') },
     { id: 'tour', title: t('onboarding.quickTour') },
     { id: 'ready', title: t('onboarding.ready') },
   ];
   const [currentStep, setCurrentStep] = useState(0);
-  const [apiKey, setLocalApiKey] = useState(getAISettings().providers.groq.apiKey);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [apiKey, setLocalApiKey] = useState('');
+  const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
   const [showKey, setShowKey] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
 
+  const handleSelectProvider = (providerId) => {
+    setSelectedProvider(providerId);
+    setTestResult(null);
+    setLocalApiKey('');
+    setShowKey(false);
+  };
+
   const handleTestApiKey = async () => {
+    if (selectedProvider === 'ollama') {
+      setTesting(true);
+      setTestResult(null);
+      updateAISettings({ providers: { ollama: { baseUrl: ollamaUrl } } });
+      const status = await checkAIStatus('ollama');
+      setTestResult(status);
+      setTesting(false);
+      return;
+    }
+
     if (!apiKey.trim()) return;
     setTesting(true);
     setTestResult(null);
-    updateAISettings({ providers: { groq: { apiKey } } });
-    const status = await checkAIStatus('groq');
+    updateAISettings({ providers: { [selectedProvider]: { apiKey } } });
+    const status = await checkAIStatus(selectedProvider);
     if (!status.running) {
-      updateAISettings({ providers: { groq: { apiKey: '' } } });
+      updateAISettings({ providers: { [selectedProvider]: { apiKey: '' } } });
     }
     setTestResult(status);
     setTesting(false);
   };
 
-  const handleSaveApiKey = async () => {
-    updateAISettings({ activeProvider: 'groq', providers: { groq: { apiKey } } });
-    await updateSettings({ groqApiKey: apiKey });
+  const handleSaveProvider = async () => {
+    if (!selectedProvider) return;
+    if (selectedProvider === 'ollama') {
+      updateAISettings({ activeProvider: 'ollama', providers: { ollama: { baseUrl: ollamaUrl } } });
+    } else {
+      updateAISettings({ activeProvider: selectedProvider, providers: { [selectedProvider]: { apiKey } } });
+      if (selectedProvider === 'groq') {
+        await updateSettings({ groqApiKey: apiKey });
+      }
+    }
   };
 
   const handleNext = () => {
-    if (currentStep === 1 && apiKey.trim()) {
-      handleSaveApiKey();
+    if (currentStep === 1 && selectedProvider) {
+      handleSaveProvider();
     }
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -61,8 +220,8 @@ export default function OnboardingFlow({ onComplete }) {
   };
 
   const handleFinish = async () => {
-    if (apiKey.trim()) {
-      handleSaveApiKey();
+    if (selectedProvider) {
+      handleSaveProvider();
     }
     await updateSettings({ onboardingCompleted: true });
     onComplete();
@@ -72,6 +231,9 @@ export default function OnboardingFlow({ onComplete }) {
     await updateSettings({ onboardingCompleted: true });
     onComplete();
   };
+
+  const needsApiKey = selectedProvider && PROVIDER_CONFIG[selectedProvider]?.requiresApiKey;
+  const keyPlaceholder = selectedProvider === 'gemini' ? 'AI...' : 'gsk_...';
 
   return (
     <div className="onboarding">
@@ -135,86 +297,111 @@ export default function OnboardingFlow({ onComplete }) {
             </div>
           )}
 
-          {/* Step 2: API Key Setup */}
+          {/* Step 2: Provider Selection + Setup */}
           {currentStep === 1 && (
             <div className="onboarding__step fade-in">
               <div className="onboarding__step-icon">
                 <Key size={32} />
               </div>
-              <h2>{t('onboarding.setupTitle')}</h2>
+              <h2>{t('onboarding.providerTitle')}</h2>
               <p className="onboarding__subtitle">
-                {t('onboarding.setupSubtitle')}
+                {t('onboarding.providerSubtitle')}
               </p>
 
-              <div className="onboarding__instructions">
-                <div className="onboarding__instruction">
-                  <span className="onboarding__instruction-num">1</span>
-                  <div>
-                    <strong>{t('onboarding.step1')}</strong>
-                    <p>
-                      Visit{' '}
-                      <a href="https://console.groq.com" target="_blank" rel="noreferrer">
-                        {t('onboarding.step1Link')} <ExternalLink size={12} />
-                      </a>
-                    </p>
-                  </div>
-                </div>
-                <div className="onboarding__instruction">
-                  <span className="onboarding__instruction-num">2</span>
-                  <div>
-                    <strong>{t('onboarding.step2')}</strong>
-                    <p>
-                      <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer">
-                        {t('onboarding.step2Link')} <ExternalLink size={12} />
-                      </a>
-                    </p>
-                  </div>
-                </div>
-                <div className="onboarding__instruction">
-                  <span className="onboarding__instruction-num">3</span>
-                  <div>
-                    <strong>{t('onboarding.step3')}</strong>
-                    <p>{t('onboarding.step3Desc')}</p>
-                  </div>
-                </div>
+              {/* Provider Cards */}
+              <div className="onboarding__provider-grid">
+                {PROVIDER_OPTIONS.map(opt => {
+                  const cfg = PROVIDER_CONFIG[opt.id];
+                  const isSelected = selectedProvider === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      className={`onboarding__provider-card ${isSelected ? 'onboarding__provider-card--selected' : ''}`}
+                      onClick={() => handleSelectProvider(opt.id)}
+                    >
+                      <div className="onboarding__provider-card-icon" style={{ color: opt.color }}>
+                        <opt.Icon size={24} />
+                      </div>
+                      <strong>{cfg.name}</strong>
+                      <p>{t(`onboarding.provider.${opt.id}Desc`)}</p>
+                      <div className="onboarding__provider-card-tags">
+                        {opt.free && <span className="onboarding__provider-tag onboarding__provider-tag--free">{t('onboarding.provider.free')}</span>}
+                        <span className="onboarding__provider-tag">{opt.tag}</span>
+                      </div>
+                      {isSelected && <div className="onboarding__provider-check"><CheckCircle size={18} /></div>}
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="onboarding__input-group">
-                <div className="onboarding__input-wrapper">
-                  <input
-                    type={showKey ? 'text' : 'password'}
-                    value={apiKey}
-                    onChange={(e) => { setLocalApiKey(e.target.value); setTestResult(null); }}
-                    placeholder="gsk_..."
-                    className="onboarding__input"
-                  />
-                  <button
-                    className="onboarding__input-toggle"
-                    onClick={() => setShowKey(!showKey)}
-                  >
-                    {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                <button
-                  className="onboarding__test-btn"
-                  onClick={handleTestApiKey}
-                  disabled={!apiKey.trim() || testing}
-                >
-                  {testing ? <Loader2 size={14} className="auth-spinner" /> : '🔌'} {t('onboarding.test')}
-                </button>
-              </div>
+              {/* Provider-specific setup */}
+              {selectedProvider && (
+                <div className="onboarding__provider-setup fade-in">
+                  <ProviderSetupInstructions providerId={selectedProvider} t={t} />
 
-              {testResult && (
-                <div className={`onboarding__test-result ${testResult.running ? 'success' : 'error'}`}>
-                  {testResult.running
-                    ? `✅ ${t('onboarding.testSuccess')}`
-                    : `❌ ${testResult.error || t('onboarding.testFailed')}`
-                  }
+                  {/* API Key Input */}
+                  {needsApiKey && (
+                    <div className="onboarding__input-group">
+                      <div className="onboarding__input-wrapper">
+                        <input
+                          type={showKey ? 'text' : 'password'}
+                          value={apiKey}
+                          onChange={(e) => { setLocalApiKey(e.target.value); setTestResult(null); }}
+                          placeholder={keyPlaceholder}
+                          className="onboarding__input"
+                        />
+                        <button
+                          className="onboarding__input-toggle"
+                          onClick={() => setShowKey(!showKey)}
+                        >
+                          {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                      <button
+                        className="onboarding__test-btn"
+                        onClick={handleTestApiKey}
+                        disabled={!apiKey.trim() || testing}
+                      >
+                        {testing ? <Loader2 size={14} className="auth-spinner" /> : '🔌'} {t('onboarding.test')}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Ollama URL Input */}
+                  {selectedProvider === 'ollama' && (
+                    <div className="onboarding__input-group">
+                      <div className="onboarding__input-wrapper">
+                        <input
+                          type="text"
+                          value={ollamaUrl}
+                          onChange={(e) => { setOllamaUrl(e.target.value); setTestResult(null); }}
+                          placeholder="http://localhost:11434"
+                          className="onboarding__input"
+                        />
+                      </div>
+                      <button
+                        className="onboarding__test-btn"
+                        onClick={handleTestApiKey}
+                        disabled={testing}
+                      >
+                        {testing ? <Loader2 size={14} className="auth-spinner" /> : '🔌'} {t('onboarding.test')}
+                      </button>
+                    </div>
+                  )}
+
+                  {testResult && (
+                    <div className={`onboarding__test-result ${testResult.running ? 'success' : 'error'}`}>
+                      {testResult.running
+                        ? `✅ ${t('onboarding.testSuccess')}`
+                        : `❌ ${testResult.error || t('onboarding.testFailed')}`
+                      }
+                    </div>
+                  )}
                 </div>
               )}
 
               <p className="onboarding__hint">
-                💡 {t('onboarding.keyHint')}
+                💡 {t('onboarding.providerHint')}
               </p>
             </div>
           )}
