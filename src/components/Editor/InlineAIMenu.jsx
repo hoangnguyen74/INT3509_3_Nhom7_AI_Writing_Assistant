@@ -11,7 +11,6 @@ import {
   summarize, paraphrase, translate, expandText,
   shortenText, checkGrammar, isAIConfigured, cleanAIOutput
 } from '../../services/ai';
-import MarkdownContent from '../common/MarkdownContent';
 import './InlineAIMenu.css';
 
 export default function InlineAIMenu({ editor }) {
@@ -85,7 +84,7 @@ export default function InlineAIMenu({ editor }) {
         case 'summarize': await summarize(text, onChunk); break;
         case 'rewrite': await paraphrase(text, onChunk); break;
         case 'grammar': await checkGrammar(text, onChunk); break;
-        case 'translate': await translate(text, 'auto', 'en', onChunk); break;
+        case 'translate': await translate(text, 'en', 'vi', onChunk); break;
         case 'expand': await expandText(text, onChunk); break;
         case 'shorten': await shortenText(text, onChunk); break;
       }
@@ -99,12 +98,15 @@ export default function InlineAIMenu({ editor }) {
   const handleApply = useCallback(() => {
     if (!editor || !result) return;
     const cleaned = cleanAIOutput(result, 'text-only');
-    editor.chain().focus().deleteSelection().insertContent(cleaned).run();
+    editor.chain().focus().deleteSelection().insertContent({
+      type: 'text',
+      text: cleaned,
+    }).run();
     handleDismiss();
   }, [editor, result]);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(result);
+    navigator.clipboard.writeText(cleanAIOutput(result, 'text-only'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [result]);
@@ -162,7 +164,7 @@ export default function InlineAIMenu({ editor }) {
       {/* Result popup */}
       {result && !loading && (
         <div ref={resultRef} className="inline-ai-menu__result">
-          <MarkdownContent text={cleanAIOutput(result, 'text-only')} className="inline-ai-menu__result-text" />
+          <div className="inline-ai-menu__result-text">{cleanAIOutput(result, 'text-only')}</div>
           <div className="inline-ai-menu__result-actions">
             <button className="wt-action-btn wt-action-btn--primary" onClick={handleApply}>
               <Replace size={12} /> {t('inline.apply')}

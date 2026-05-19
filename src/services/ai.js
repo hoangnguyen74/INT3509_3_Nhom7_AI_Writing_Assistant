@@ -170,6 +170,11 @@ export function cleanAIOutput(text, mode = 'text-only') {
   if (mode === 'text-only') {
     // Strip markdown code fences wrapping the entire output
     cleaned = cleaned.replace(/^```[\w]*\n([\s\S]*?)\n```$/g, '$1');
+    // Strip wrapping triple-quotes or double-quotes around the entire text
+    cleaned = cleaned.replace(/^"""\s*([\s\S]*?)\s*"""$/g, '$1');
+    if (/^"[^]*"$/.test(cleaned) && cleaned.split('"').length === 3) {
+      cleaned = cleaned.slice(1, -1);
+    }
     // Strip trailing explanation after --- separator
     const sepIdx = cleaned.lastIndexOf('\n---\n');
     if (sepIdx > 0) cleaned = cleaned.substring(sepIdx + 5).trim() || cleaned.substring(0, sepIdx).trim();
