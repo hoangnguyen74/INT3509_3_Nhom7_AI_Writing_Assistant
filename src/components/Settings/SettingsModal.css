@@ -11,9 +11,11 @@
 }
 
 .settings-modal--wide .settings-modal__body {
-  padding: 28px 36px;
+  padding: 24px 32px;
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1;
+  min-height: 0;
 }
 
 /* Provider Tabs */
@@ -97,11 +99,13 @@
 
 /* Setup Guide */
 .settings-setup-guide {
-  margin-bottom: 24px;
-  padding: 16px 20px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
   background: rgba(59, 130, 246, 0.04);
   border: 1px solid rgba(59, 130, 246, 0.12);
   border-radius: var(--radius-md);
+  overflow: hidden;
+  word-break: break-word;
 }
 
 [data-theme="dark"] .settings-setup-guide {
@@ -234,27 +238,19 @@
   opacity: 0.9;
 }
 
-/* Actions row — Test + Set Active on same line */
-.settings-modal__actions-row {
+/* Button stack — 3 buttons stacked with tight spacing */
+.settings-modal__btn-stack {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-/* Save row — alone on its own line */
-.settings-modal__save-row {
-  margin-top: 24px;
-  padding-top: 20px;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
 }
 
-.settings-btn--save {
+.settings-btn--full {
   width: 100%;
   justify-content: center;
-  padding: 12px 24px;
-  font-size: var(--text-base);
 }
 
 /* Test result */
@@ -264,8 +260,7 @@
 
 /* Responsive */
 @media (max-width: 640px) {
-  .settings-modal__actions-row {
-    flex-direction: column;
-    align-items: stretch;
+  .settings-modal--wide .settings-modal__body {
+    padding: 16px 20px;
   }
 }
