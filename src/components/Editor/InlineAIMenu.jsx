@@ -9,8 +9,9 @@ import {
 } from 'lucide-react';
 import {
   summarize, paraphrase, translate, expandText,
-  shortenText, checkGrammar, isAIConfigured
+  shortenText, checkGrammar, isAIConfigured, cleanAIOutput
 } from '../../services/ai';
+import MarkdownContent from '../common/MarkdownContent';
 import './InlineAIMenu.css';
 
 export default function InlineAIMenu({ editor }) {
@@ -97,7 +98,8 @@ export default function InlineAIMenu({ editor }) {
 
   const handleApply = useCallback(() => {
     if (!editor || !result) return;
-    editor.chain().focus().deleteSelection().insertContent(result).run();
+    const cleaned = cleanAIOutput(result, 'text-only');
+    editor.chain().focus().deleteSelection().insertContent(cleaned).run();
     handleDismiss();
   }, [editor, result]);
 
@@ -160,7 +162,7 @@ export default function InlineAIMenu({ editor }) {
       {/* Result popup */}
       {result && !loading && (
         <div ref={resultRef} className="inline-ai-menu__result">
-          <div className="inline-ai-menu__result-text">{result}</div>
+          <MarkdownContent text={cleanAIOutput(result, 'text-only')} className="inline-ai-menu__result-text" />
           <div className="inline-ai-menu__result-actions">
             <button className="wt-action-btn wt-action-btn--primary" onClick={handleApply}>
               <Replace size={12} /> {t('inline.apply')}

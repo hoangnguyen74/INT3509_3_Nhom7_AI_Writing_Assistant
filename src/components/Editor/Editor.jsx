@@ -18,6 +18,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import { GrammarHighlight } from './extensions/GrammarHighlight';
 import { useGrammarCheck } from '../../hooks/useGrammarCheck';
 import { useApp } from '../../contexts/AppContext';
+import { isAIConfigured } from '../../services/ai';
 import Toolbar from './Toolbar';
 import AIToolbar from './AIToolbar';
 import DiffSuggestion from './DiffSuggestion';
@@ -40,7 +41,7 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
   const [aiError, setAiError] = useState('');
   const [showFind, setShowFind] = useState(false);
   const [showGrammarPanel, setShowGrammarPanel] = useState(false);
-  const [grammarEnabled, setGrammarEnabled] = useState(false);
+  const [grammarEnabled, setGrammarEnabled] = useState(() => isAIConfigured());
 
   // Ctrl+F / Ctrl+H keyboard shortcuts
   useEffect(() => {

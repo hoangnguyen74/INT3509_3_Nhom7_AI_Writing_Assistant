@@ -142,9 +142,40 @@ const PERSONA_PROMPTS = {
   academic: 'You are a rigorous Academic Researcher. Maintain a formal, objective, scholarly tone, avoiding colloquialisms.',
 };
 
-function buildSystem(task, format = 'Return ONLY the requested output. NO conversational padding. NO "Here is your text".', persona = 'general') {
+function buildSystem(task, format = 'Return ONLY the final rewritten text. No introductions, no explanations, no "Here is...", no bullet points about changes. Just the text itself.', persona = 'general') {
   const pContext = PERSONA_PROMPTS[persona] || PERSONA_PROMPTS.general;
   return `ROLE: ${pContext}\nTASK: ${task}\nFORMAT RULES: ${format}\nMatch the language of the user's input unless explicitly specified otherwise.`;
+}
+
+// ==================== Post-processing ====================
+
+const PREAMBLE_PATTERNS = [
+  /^(?:Here(?:'s| is)(?: the| your)?[\s\S]*?:\s*\n)/i,
+  /^(?:Sure[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
+  /^(?:I've (?:rewritten|revised|corrected|improved|summarized|expanded|shortened|paraphrased)[\s\S]*?:\s*\n)/i,
+  /^(?:(?:The|Below is the) (?:corrected|revised|rewritten|improved|summarized)[\s\S]*?:\s*\n)/i,
+  /^(?:Certainly[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
+  /^(?:Of course[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
+];
+
+export function cleanAIOutput(text, mode = 'text-only') {
+  if (!text || mode === 'raw') return text || '';
+  let cleaned = text.trim();
+
+  // Strip preamble lines
+  for (const pattern of PREAMBLE_PATTERNS) {
+    cleaned = cleaned.replace(pattern, '');
+  }
+
+  if (mode === 'text-only') {
+    // Strip markdown code fences wrapping the entire output
+    cleaned = cleaned.replace(/^```[\w]*\n([\s\S]*?)\n```$/g, '$1');
+    // Strip trailing explanation after --- separator
+    const sepIdx = cleaned.lastIndexOf('\n---\n');
+    if (sepIdx > 0) cleaned = cleaned.substring(sepIdx + 5).trim() || cleaned.substring(0, sepIdx).trim();
+  }
+
+  return cleaned.trim();
 }
 
 // ==================== Chat Function (multi-turn) ====================
@@ -167,8 +198,8 @@ export async function summarize(text, onChunk, persona = 'general') {
 
 export async function checkGrammar(text, onChunk, persona = 'general') {
   const sys = buildSystem(
-    'Act as an expert proofreader. Check for grammar, spelling, punctuation, and style issues.',
-    'Output a brief list of improvements, then output the fully corrected text separated by "---". NEVER say "Here is the result".',
+    'Act as an expert proofreader. Fix all grammar, spelling, punctuation, and style issues.',
+    'Return ONLY the corrected text. Do not list changes or explain what you fixed. Just output the final corrected version.',
     persona
   );
   return aiGenerate(sys, `Input:\n"""\n${text}\n"""`, onChunk);

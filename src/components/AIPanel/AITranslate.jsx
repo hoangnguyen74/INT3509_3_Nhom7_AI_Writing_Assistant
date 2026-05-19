@@ -7,6 +7,7 @@ import {
   Languages, ArrowRightLeft, Copy, Check, Replace,
   Loader2, AlertCircle
 } from 'lucide-react';
+import { marked } from 'marked';
 import { translate, LANGUAGE_NAMES } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
 
@@ -84,10 +85,11 @@ export default function AITranslate({ editor, isReady }) {
   const handleApply = useCallback(() => {
     if (!editor || !result) return;
     const { from, to } = editor.state.selection;
+    const html = marked.parse(result, { breaks: true });
     if (from !== to) {
-      editor.chain().focus().deleteSelection().insertContent(result).run();
+      editor.chain().focus().deleteSelection().insertContent(html).run();
     } else {
-      editor.commands.setContent(`<p>${result.replace(/\n/g, '</p><p>')}</p>`);
+      editor.commands.setContent(html);
     }
   }, [editor, result]);
 

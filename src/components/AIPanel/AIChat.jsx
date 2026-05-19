@@ -7,8 +7,10 @@ import {
   Send, Trash2, ArrowDownToLine, Copy, Check,
   Loader2, ToggleLeft, ToggleRight
 } from 'lucide-react';
+import { marked } from 'marked';
 import { chat } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
+import MarkdownContent from '../common/MarkdownContent';
 
 export default function AIChat({ editor, isReady }) {
   const { t } = useTranslation();
@@ -104,9 +106,8 @@ export default function AIChat({ editor, isReady }) {
 
   const handleInsert = (content) => {
     if (!editor) return;
-    editor.chain().focus().insertContent(
-      `<p>${content.replace(/\n/g, '</p><p>')}</p>`
-    ).run();
+    const html = marked.parse(content, { breaks: true });
+    editor.chain().focus().insertContent(html).run();
   };
 
   return (
@@ -161,7 +162,10 @@ export default function AIChat({ editor, isReady }) {
               {msg.role === 'user' ? '👤' : '🤖'}
             </div>
             <div className="chat-message__bubble">
-              <div className="chat-message__content">{msg.content}</div>
+              {msg.role === 'assistant'
+                ? <MarkdownContent text={msg.content} className="chat-message__content" />
+                : <div className="chat-message__content">{msg.content}</div>
+              }
               {msg.role === 'assistant' && !msg.isError && msg.content !== '...' && (
                 <div className="chat-message__actions">
                   <button onClick={() => handleCopy(idx)} title="Copy">

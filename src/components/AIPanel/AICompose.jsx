@@ -7,8 +7,10 @@ import {
   Send, Copy, Check, ArrowDownToLine, Loader2, AlertCircle,
   FileText, ListChecks, ChevronRight
 } from 'lucide-react';
-import { compose, continueWriting, generateOutline } from '../../services/ai';
+import { marked } from 'marked';
+import { compose, continueWriting, generateOutline, cleanAIOutput } from '../../services/ai';
 import { useApp } from '../../contexts/AppContext';
+import MarkdownContent from '../common/MarkdownContent';
 
 export default function AICompose({ editor, isReady }) {
   const { t } = useTranslation();
@@ -95,10 +97,12 @@ export default function AICompose({ editor, isReady }) {
 
   const handleInsert = useCallback(() => {
     if (!editor || !result) return;
-    editor.chain().focus().insertContent(
-      `<p>${result.replace(/\n/g, '</p><p>')}</p>`
-    ).run();
-  }, [editor, result]);
+    const cleaned = mode === 'continue'
+      ? cleanAIOutput(result, 'text-only')
+      : cleanAIOutput(result, 'markdown');
+    const html = marked.parse(cleaned, { breaks: true });
+    editor.chain().focus().insertContent(html).run();
+  }, [editor, result, mode]);
 
   return (
     <div className="ai-compose">
@@ -243,7 +247,7 @@ export default function AICompose({ editor, isReady }) {
               </button>
             </div>
           </div>
-          <div className="wt-result__text">{result}</div>
+          <MarkdownContent text={mode === 'continue' ? cleanAIOutput(result, 'text-only') : cleanAIOutput(result, 'markdown')} className="wt-result__text" />
         </div>
       )}
     </div>

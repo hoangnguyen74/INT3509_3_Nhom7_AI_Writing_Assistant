@@ -5,7 +5,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { checkGrammarInline } from '../services/ai';
 import { setGrammarDecorations, clearGrammarDecorations } from '../components/Editor/extensions/GrammarHighlight';
 
-const DEBOUNCE_MS = 3000;
+const DEBOUNCE_MS = 5000;
 const MAX_PARAGRAPHS_PER_CHECK = 5;
 
 function hashText(text) {
