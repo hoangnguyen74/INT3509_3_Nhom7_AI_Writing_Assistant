@@ -131,8 +131,21 @@ export async function checkGeminiStatus(providerSettings = {}) {
   if (!apiKey) return { running: false, error: 'No API key configured' };
 
   const modelId = model || getDefaultModel('gemini');
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
 
+  // First try listing models to verify the API key works
+  try {
+    const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=5`;
+    const listRes = await fetch(listUrl);
+    if (!listRes.ok) {
+      const listErr = await listRes.json().catch(() => ({}));
+      return { running: false, error: listErr.error?.message || `API key error (${listRes.status})` };
+    }
+  } catch {
+    return { running: false, error: 'Network error — cannot reach Google AI API' };
+  }
+
+  // Then test the specific model
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -144,9 +157,11 @@ export async function checkGeminiStatus(providerSettings = {}) {
     });
 
     if (res.ok) return { running: true, model: modelId };
-    const err = await res.json();
-    return { running: false, error: err.error?.message || 'Invalid API key' };
-  } catch {
-    return { running: false, error: 'Network error connecting to Gemini' };
+    const err = await res.json().catch(() => ({}));
+    const msg = err.error?.message || `Error ${res.status}`;
+    // If this model fails, suggest trying another
+    return { running: false, error: `${msg} — Try a different model.` };
+  } catch (e) {
+    return { running: false, error: `Model test failed: ${e.message}` };
   }
 }

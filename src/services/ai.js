@@ -15,7 +15,7 @@ const DEFAULT_AI_SETTINGS = {
   activeProvider: 'groq',
   providers: {
     groq:   { apiKey: '', model: 'llama-3.3-70b-versatile' },
-    gemini: { apiKey: '', model: 'gemini-2.0-flash' },
+    gemini: { apiKey: '', model: 'gemini-2.5-flash' },
     ollama: { baseUrl: 'http://localhost:11434', model: '' },
   },
 };
