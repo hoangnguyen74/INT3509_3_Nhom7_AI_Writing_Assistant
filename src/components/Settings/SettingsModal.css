@@ -2,7 +2,7 @@
    Settings Modal — Multi-provider AI configuration
    ======================================== */
 
-.settings-modal--wide {
+.settings-modal.settings-modal--wide {
   max-width: 900px;
   width: 90vw;
   max-height: 90vh;
