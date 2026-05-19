@@ -104,8 +104,6 @@
   background: rgba(59, 130, 246, 0.04);
   border: 1px solid rgba(59, 130, 246, 0.12);
   border-radius: var(--radius-md);
-  overflow: hidden;
-  word-break: break-word;
 }
 
 [data-theme="dark"] .settings-setup-guide {
@@ -204,18 +202,25 @@
   border-color: var(--primary-500);
 }
 
-/* Active indicator */
+/* Active indicator — boxed to match buttons */
 .settings-active-indicator {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  padding: 10px 20px;
+  border: 1px solid var(--success-text, #166534);
+  border-radius: var(--radius-sm);
   color: var(--success-text, #166534);
+  background: var(--success-bg, #dcfce7);
   font-size: var(--text-sm);
   font-weight: 500;
 }
 
 [data-theme="dark"] .settings-active-indicator {
   color: #6ee7b7;
+  border-color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
 }
 
 /* Accent button */
@@ -238,19 +243,21 @@
   opacity: 0.9;
 }
 
-/* Button stack — 3 buttons stacked with tight spacing */
-.settings-modal__btn-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* Button row — 3 items on one line, equal width */
+.settings-modal__btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
 
-.settings-btn--full {
+.settings-modal__btn-row .settings-btn,
+.settings-modal__btn-row .settings-active-indicator {
   width: 100%;
   justify-content: center;
+  text-align: center;
 }
 
 /* Test result */

@@ -345,10 +345,10 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
             </div>
           )}
 
-          {/* Action buttons — stacked, tight spacing */}
-          <div className="settings-modal__btn-stack">
+          {/* Action buttons — 3 items, same row */}
+          <div className="settings-modal__btn-row">
             <button
-              className="settings-btn settings-btn--secondary settings-btn--full"
+              className="settings-btn settings-btn--secondary"
               onClick={handleTest}
               disabled={testing || (config.requiresApiKey && !providerSettings.apiKey)}
             >
@@ -357,19 +357,19 @@ export default function SettingsModal({ isOpen, onClose, onSave }) {
 
             {!isActive ? (
               <button
-                className="settings-btn settings-btn--accent settings-btn--full"
+                className="settings-btn settings-btn--accent"
                 onClick={() => handleSetActive(activeTab)}
               >
                 <Check size={14} /> {t('settings.setAsActive')}
               </button>
             ) : (
-              <span className="settings-active-indicator settings-btn--full">
+              <span className="settings-active-indicator">
                 <Check size={14} /> {t('settings.currentlyActive')}
               </span>
             )}
 
             <button
-              className="settings-btn settings-btn--primary settings-btn--full"
+              className="settings-btn settings-btn--primary"
               onClick={handleSave}
             >
               {t('settings.save')}
