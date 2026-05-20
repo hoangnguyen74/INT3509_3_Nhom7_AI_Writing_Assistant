@@ -1,124 +1,218 @@
-# ✍️ WriteAI
+# ✍️ WriteAI — AI Writing Assistant
 
-**WriteAI** là một không gian làm việc thông minh, hiện đại và giàu tính năng được sức mạnh của Trí tuệ Nhân tạo (AI) hậu thuẫn. Nền tảng này kết hợp sự linh hoạt của một trình soạn thảo văn bản (Rich Text Editor) với khả năng xử lý ngôn ngữ vượt trội của các mô hình LLM tiên tiến (Groq / LLaMA-3), được thiết kế chuyên biệt để giúp bạn viết lách tốt hơn, nhanh hơn và thông minh hơn.
+**WriteAI** là một trợ lý viết lách thông minh, kết hợp trình soạn thảo Rich Text Editor (TipTap/ProseMirror) với sức mạnh AI đa nhà cung cấp (Groq, Google Gemini, Ollama). Nền tảng hỗ trợ soạn thảo, kiểm tra ngữ pháp real-time, dịch thuật đa ngôn ngữ, và nhiều công cụ AI chuyên biệt.
 
-## ✨ Các tính năng nổi bật
-
-### 📝 Trình soạn thảo Cốt lõi (Core Editor)
-- **Định dạng Văn bản Nâng cao**: Xây dựng dựa trên nền tảng TipTap, hỗ trợ in đậm, in nghiêng, highlight, và cấu trúc tiêu đề (Heading) đầy đủ.
-- **Khối chức năng đa dạng (Advanced Blocks)**: Hỗ trợ tạo bảng (Tables), trích dẫn (Blockquotes), chèn mã nguồn (Code blocks), danh sách công việc (Checklists) và chèn ảnh nội tuyến tiện lợi.
-- **Chèn Liên kết Hiện đại**: Giao diện chèn link dạng popup tương tự Slack (phím tắt `Ctrl+K` hoặc dùng Toolbar) cho phép tuỳ chỉnh chữ hiển thị.
-- **Tìm kiếm & Thay thế (Find & Replace)**: Panel tìm kiếm chuyên dụng tích hợp sẵn (`Ctrl+F` / `Ctrl+H`), hoạt động mượt mà kết hợp với điều hướng luân chuyển bằng bàn phím.
-- **Lưu tự động (Auto-Save)**: Tài liệu của bạn luôn được an toàn nhờ cơ chế đồng bộ theo thời gian thực xuống IndexedDB (cục bộ) và Firebase (đám mây).
-
-### 🤖 Bộ công cụ Trợ lý AI (AI Writing Suite)
-Được tiếp sức bởi tốc độ suy luận siêu tốc của Groq API:
-- **Soạn thảo Thông minh (Smart Compose)**: Chỉ với một cú nhấp chuột, AI sẽ giúp bạn lên ý tưởng, lập dàn ý, mở rộng, việt hoá, rút gọn hoặc tự động sửa lỗi ngữ pháp.
-- **Dịch thuật Thần tốc (Magic Translate)**: Dịch thuật tức thời hỗ trợ hơn 15+ ngôn ngữ.
-- **Điều chỉnh Giọng văn (Tone Adjustment)**: Chuyển đổi linh hoạt văn phong của bạn (Chuyên nghiệp, Gần gũi, Tự tin, Mộc mạc).
-- **Chuyên gia Định danh (Expert Personas)**: Đóng vai và viết lại nội dung góc nhìn của một Giám đốc Công nghệ (Tech Lead), Chuyên gia Marketing, hoặc Nhà nghiên cứu Học thuật.
-- **Hỗ trợ Nội tuyến (Contextual Inline AI)**: Bôi đen một đoạn text bất kỳ và thanh công cụ AI bay (Floating menu) sẽ hiện ra để bạn lập tức ra lệnh tinh chỉnh cấu trúc câu đó.
-
-### 🗂️ Quản lý Tài liệu
-- **Bảng điều khiển (Dashboard)**: Quản lý khoa học tiến độ công việc với các thư mục Tài liệu gần đây, Yêu thích (Favorites) và Thùng rác (Trash).
-- **Thư viện Mẫu (Template Gallery)**: Bắt đầu viết lách nhanh chóng với các định dạng dựng sẵn (Bài đăng Blog, Biên bản Cuộc họp, Thông cáo Báo chí, Mô tả Công việc, v.v.).
-- **Xuất file Đa định dạng (Multi-Format Export)**: Đóng gói tác phẩm của bạn hoàn hảo sang định dạng **PDF (giữ nguyên tỷ lệ và font)**, **Markdown (.md)**, **HTML**, và **Text thuần**.
-
-### 💼 Sẵn sàng cho mô hình SaaS & Thương mại hoá
-- **Giới hạn & Tường phí (Paywall & Quotas)**: Hệ thống mô phỏng việc thương mại hoá. Người dùng Gói Miễn phí nhận được giới hạn hàng ngày (10 lượt gọi AI), cùng hệ thống Popup kêu gọi nâng cấp "Pro" xịn xò.
-- **Thiết lập Cá nhân (User Settings)**: Hỗ trợ nhập API Key cá nhân (Bring Your Own Key) để vượt giới hạn, và tuỳ chỉnh giao diện sáng/tối.
-- **Trải nghiệm Giới thiệu (Onboarding Flow)**: Cửa sổ Popup gồm các bước hướng dẫn cực đẹp mắt dành cho người dùng lần đầu đăng nhập.
-
-### 🎨 Tinh chỉnh UI/UX
-- **Giao diện Tối/Sáng (Dark/Light Mode)**: 100% tuỳ biến thông qua hệ thống biến số CSS (CSS-variable tokens).
-- **Thiết kế Thích ứng (Responsive)**: Tối ưu hoá hiển thị cho di động với thanh công cụ Sidebar và AI Panels dạng Overlay.
-- **Skeleton & Toasts**: Hiệu ứng chờ "tải khung" sang trọng và hệ thống thông báo trạng thái thao tác đẹp mắt.
-- **Bảo mật Lỗi (Error Boundaries)**: Đảm bảo nền tảng không bao giờ bị trắng trang (crash) hoàn toàn với cơ chế bắt lỗi an toàn.
+> **Bài tập lớn** — INT3509_3, Nhóm 7, Trường Đại học Công nghệ (UET - VNU)
 
 ---
 
-## 🛠️ Trụ cột Công nghệ (Tech Stack)
+## ✨ Tính năng nổi bật
 
-- **Framework**: React 18 / Vite
-- **Trình soạn thảo (Editor)**: TipTap 
-- **Backend & Xác thực**: Firebase (Authentication, Firestore)
-- **Lưu trữ Cục bộ**: IndexedDB (thông qua `idb` wrapper cho chức năng lưu Offline)
-- **Mô hình AI (LLM)**: Groq API (`llama-3.3-70b-versatile`)
-- **Xuất PDF**: `html2pdf.js`
-- **Bộ Icon**: Lucide React
+### 📝 Trình soạn thảo (Rich Text Editor)
+- **TipTap 3** với 12+ extensions: Bold, Italic, Heading, Highlight, Tables, Task Lists, Images, Links, Code Blocks, Text Align
+- **Tìm kiếm & Thay thế** (`Ctrl+F` / `Ctrl+H`) với điều hướng bàn phím
+- **Lưu tự động** (debounce 2s) vào IndexedDB (local-first, privacy by default)
+- **Xuất đa định dạng**: PDF, Markdown, HTML, Plain Text
 
----
+### 🤖 AI đa nhà cung cấp (Multi-Provider AI)
+Hỗ trợ 3 nhà cung cấp AI, chuyển đổi linh hoạt trong Settings:
 
-## 🚀 Hướng dẫn Cài đặt
+| Provider | Đặc điểm | Models |
+|----------|----------|--------|
+| **Groq Cloud** | Tốc độ suy luận nhanh nhất, miễn phí | Llama 3.3 70B, Llama 3.1 8B, Mixtral 8x7B, Gemma 2 |
+| **Google Gemini** | API miễn phí, hỗ trợ Gemma 4 | Gemini 2.5 Flash, Gemma 4 31B, Gemma 4 26B MoE |
+| **Ollama (Local)** | Chạy offline trên máy, không cần API key | Mọi model đã cài (llama3, mistral, phi3...) |
 
-### Yêu cầu hệ thống
-- Node.js (v18+)
-- Tài khoản Firebase (Dùng để lấy API thiết lập Database & Auth)
-- Groq API Key (Nếu bạn không thiết lập fallback key trong code)
+- **Streaming Response** (SSE) — kết quả AI hiện từng chữ real-time
+- **Facade Pattern** — 1 entry point `ai.js`, component không cần biết đang dùng provider nào
+- **Post-processing** — `cleanAIOutput()` tự động lọc preamble, quotes thừa từ LLM
 
-### Các bước Cài đặt
+### 🔧 Bộ công cụ AI
+- **AI Compose**: Soạn nội dung theo content type (Email, Blog, Essay, Report...) + tone + ngôn ngữ
+- **AI Chat**: Hỏi đáp đa lượt với AI, toggle "Editor Context" để AI đọc văn bản đang soạn
+- **AI Translate**: Dịch thuật 15+ ngôn ngữ, hoán đổi chiều dịch
+- **AI Toolbar**: Summarize, Fix Grammar, Paraphrase, Expand, Shorten, Improve Readability, Change Tone
+- **Inline AI Menu**: Bôi đen text → floating menu hiện ra → thao tác AI trực tiếp trên text
+- **Expert Personas**: Chuyển góc nhìn viết (General, Tech Lead, Sales, Academic)
+- **Markdown Rendering**: Kết quả AI render đẹp (headings, bold, lists, code blocks) thay vì raw text
 
-1. **Clone repository về máy**
-   ```bash
-   git clone https://github.com/hoangnguyen74/INT3509_3_Nhom7_AI_Writing_Assistant.git
-   cd INT3509_3_Nhom7_AI_Writing_Assistant
-   ```
+### ✅ Kiểm tra ngữ pháp Real-time (Grammar Check)
+- Tự động bật khi AI đã configured, debounce 5s
+- Chỉ check paragraphs đã thay đổi (fingerprint comparison, tiết kiệm quota)
+- Gạch chân wavy (ProseMirror Decorations) + hover tooltip với gợi ý sửa
+- Grammar Panel tổng hợp toàn bộ lỗi + Fix All
 
-2. **Cài đặt các gói phụ thuộc (Dependencies)**
-   ```bash
-   npm install
-   ```
+### 🌐 Đa ngôn ngữ (i18n)
+- **Tiếng Việt** / **English** — ~250 translation keys mỗi ngôn ngữ
+- Toggle ngôn ngữ UI bất kỳ lúc nào qua Language Switcher
 
-3. **Thiết lập Môi trường (.env)**
-   Hãy tạo một file tên là `.env` ở thư mục gốc của dự án và điền thông tin Firebase của bạn vào:
-   ```env
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   
-   # Không bắt buộc: Key AI mặc định dành cho những users không sử dụng Key cá nhân (BYOK)
-   VITE_GROQ_API_KEY=your_groq_key
-   ```
+### 🗂️ Quản lý tài liệu
+- Dashboard với Recent Documents, Favorites, Trash (soft delete)
+- Template Gallery (Blog Post, Meeting Notes, Press Release, Job Description...)
+- Full-text search trong sidebar
 
-4. **Khởi chạy Môi trường Phát triển (Development Server)**
-   ```bash
-   npm run dev
-   ```
-
-5. **Đóng gói Sản phẩm (Build for Production)**
-   ```bash
-   npm run build
-   ```
+### 💼 Mô hình Freemium
+- 10 lượt gọi AI/ngày (free tier), upgrade Pro để unlimited
+- Onboarding Flow 4 bước cho người dùng mới (bao gồm chọn AI Provider)
+- Dark / Light / System theme
 
 ---
 
-## 🏗️ Cấu trúc Thư mục
+## 🛠️ Tech Stack
 
-```text
-src/
-├── components/          # Chứa các mảnh UI tái sử dụng
-│   ├── AIPanel/         # Sidebar Trợ lý ảo AI (Chat, Translate...)
-│   ├── Editor/          # Trình soạn thảo TipTap, Toolbar, Find&Replace
-│   ├── Sidebar/         # Thanh điều hướng, Danh sách văn bản
-│   ├── Paywall/         # Popup thông báo Nâng cấp
-│   ├── Onboarding/      # Màn hình Giới thiệu tính năng
-│   └── TemplateGallery/ # Giao diện Thư viện Mẫu
-├── contexts/            # Quản lý Trạng thái Toàn cục (AppContext)
-├── pages/               # Tầng Routing mức trên cùng (Ví dụ: AuthPage)
-├── services/            # Các hàm gọi API & Database
-│   ├── groq.js          # Chứa Prompt và Logic kết nối AI
-│   ├── export.js        # Logic xuất file (Markdown, HTML, PDF)
-│   ├── storage.js       # Quản lý lưu trữ Offline qua IndexedDB
-│   └── auth.js          # Logic xác thực Firebase Auth
-├── App.jsx              # Tệp chạy chính (Kết nối Dashboard/Editor/Sidebar)
-├── main.jsx             # Điểm entry của React DOM + Lớp màng lọc lỗi
-└── base.css...          # Khai báo các thiết lập và biến số CSS
+| Thành phần | Công nghệ |
+|------------|-----------|
+| **Framework** | React 18 + Vite 6 |
+| **Editor** | TipTap 3 (ProseMirror-based), 12+ extensions |
+| **AI Providers** | Groq API, Google Gemini API, Ollama (local) |
+| **Markdown** | marked (render AI output) |
+| **Auth** | Firebase Authentication (Email/Password + Google OAuth) |
+| **Database** | Cloud Firestore (user settings) + IndexedDB via `idb` (documents) |
+| **i18n** | react-i18next + i18next |
+| **Export** | html2pdf.js (PDF), custom Markdown/HTML converter |
+| **Icons** | Lucide React |
+| **Deploy** | Vercel (CI/CD từ GitHub main branch) |
+
+---
+
+## 🚀 Cài đặt & Chạy
+
+### Yêu cầu
+- Node.js v18+
+- Firebase project (Auth + Firestore)
+- API Key từ ít nhất 1 provider: [Groq Console](https://console.groq.com/keys) hoặc [Google AI Studio](https://aistudio.google.com/apikey) hoặc [Ollama](https://ollama.com/download)
+
+### Các bước
+
+```bash
+# 1. Clone
+git clone https://github.com/hoangnguyen74/INT3509_3_Nhom7_AI_Writing_Assistant.git
+cd INT3509_3_Nhom7_AI_Writing_Assistant
+
+# 2. Install
+npm install
+
+# 3. Tạo file .env
+cp .env.example .env   # hoặc tạo thủ công
+```
+
+**Nội dung `.env`:**
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
+
+```bash
+# 4. Chạy dev server
+npm run dev
+
+# 5. Build production
+npm run build
+```
+
+### Sử dụng Ollama (local AI)
+```bash
+# Cài Ollama: https://ollama.com/download
+ollama pull llama3
+ollama serve
+
+# Nếu chạy app từ domain khác localhost (ví dụ Vercel):
+OLLAMA_ORIGINS=* ollama serve
 ```
 
 ---
 
-## 📜 Giới thiệu Bối cảnh Lưu trữ
-Dự án này được lên ý tưởng và hoàn thiện nhằm phục vụ cho học phần **INT3509_3 (Môn học: AI Writing Assistant)**. Đóng vai trò là một nguyên mẫu chất lượng cao (high-fidelity prototype), dự án chứng minh thành công việc tích hợp kiến trúc ứng dụng React web hiện đại với những phương pháp Prompt-Engineering trực tiếp trong việc kết nối với trí tuệ nhân tạo.
+## 🏗️ Cấu trúc thư mục
+
+```text
+src/
+├── components/
+│   ├── AIPanel/           # AI Chat, Compose, Translate (side panel)
+│   ├── Editor/            # TipTap Editor, Toolbar, AIToolbar, InlineAIMenu
+│   │   ├── extensions/    # Custom TipTap extensions (GrammarHighlight)
+│   │   ├── GrammarTooltip.jsx
+│   │   ├── GrammarPanel.jsx
+│   │   └── DiffSuggestion.jsx
+│   ├── Settings/          # SettingsModal (multi-provider config)
+│   ├── Sidebar/           # Document list, search, favorites, trash
+│   ├── Onboarding/        # 4-step onboarding with provider selector
+│   ├── Paywall/           # Upgrade modal (freemium)
+│   ├── TemplateGallery/   # Document templates
+│   ├── LanguageSwitcher/  # EN/VI toggle
+│   └── common/            # Shared components (MarkdownContent)
+├── contexts/
+│   └── AppContext.jsx     # Global state (useReducer + Context)
+├── hooks/
+│   └── useGrammarCheck.js # Grammar check orchestration hook
+├── i18n/
+│   ├── index.js           # i18next config
+│   └── locales/           # en.json, vi.json
+├── pages/
+│   └── AuthPage.jsx       # Login / Register
+├── services/
+│   ├── ai.js              # AI Facade — routing, settings, cleanAIOutput
+│   ├── providers/
+│   │   ├── models.js      # Provider config (models, URLs, API keys)
+│   │   ├── groq.js        # Groq provider
+│   │   ├── gemini.js      # Google Gemini/Gemma provider
+│   │   ├── ollama.js      # Ollama local provider
+│   │   └── openai-compat.js  # Shared SSE streaming logic
+│   ├── auth.js            # Firebase Auth
+│   ├── storage.js         # IndexedDB document storage
+│   └── export.js          # PDF, Markdown, HTML, Text export
+├── App.jsx                # Main app (Dashboard + Editor + Sidebar)
+└── main.jsx               # Entry point
+```
+
+---
+
+## 📐 Kiến trúc
+
+```text
+┌─────────────────────────────────────────────────┐
+│                   React 18 SPA                  │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐ │
+│  │  Editor   │  │ AI Panel │  │   Sidebar     │ │
+│  │ (TipTap)  │  │ Chat     │  │ Documents     │ │
+│  │ Toolbar   │  │ Compose  │  │ Search/Favs   │ │
+│  │ Grammar   │  │ Translate│  │ Trash         │ │
+│  └────┬──────┘  └────┬─────┘  └───────┬───────┘ │
+│       │              │                │         │
+│  ┌────┴──────────────┴────────────────┴───────┐ │
+│  │         AppContext (useReducer)             │ │
+│  └────┬──────────────┬────────────────┬───────┘ │
+│       │              │                │         │
+│  ┌────┴────┐   ┌─────┴─────┐   ┌─────┴───────┐ │
+│  │ storage │   │   ai.js   │   │    auth     │ │
+│  │ (IDB)   │   │  Facade   │   │ (Firebase)  │ │
+│  └─────────┘   └─────┬─────┘   └─────────────┘ │
+└────────────────────────┼────────────────────────┘
+                         │
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+     ┌──────────┐ ┌──────────┐ ┌──────────┐
+     │   Groq   │ │  Gemini  │ │  Ollama  │
+     │  Cloud   │ │  Cloud   │ │  Local   │
+     └──────────┘ └──────────┘ └──────────┘
+```
+
+- **SPA** (Single-Page Application) — Client-Side Rendering
+- **Facade Pattern** — `ai.js` route request tới đúng provider
+- **Local-first** — Documents lưu IndexedDB, settings sync Firestore
+- **SSE Streaming** — AI response hiện real-time từng token
+
+---
+
+## 👥 Nhóm phát triển
+
+**Nhóm 7** — INT3509_3, UET - VNU
+
+---
+
+## 📜 License
+
+Dự án phục vụ mục đích học tập.
