@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check, X, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { cleanAIOutput } from '../../services/ai';
 import './DiffSuggestion.css';
 
 export default function DiffSuggestion({ result, loading, error, onAccept, onReject }) {
@@ -42,19 +43,7 @@ export default function DiffSuggestion({ result, loading, error, onAccept, onRej
         )}
         {!loading && !error && result && (
            <div className="diff-text">
-             {/* If it's the grammar tool with ---, split it */}
-             {result.includes('---') ? (
-               <>
-                 <div className="diff-grammar-analysis">
-                   {result.split('---')[0]}
-                 </div>
-                 <div className="diff-grammar-result">
-                   {result.split('---')[1]}
-                 </div>
-               </>
-             ) : (
-               result
-             )}
+             {cleanAIOutput(result, 'text-only')}
            </div>
         )}
       </div>

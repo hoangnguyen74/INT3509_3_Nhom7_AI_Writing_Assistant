@@ -18,7 +18,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import { GrammarHighlight } from './extensions/GrammarHighlight';
 import { useGrammarCheck } from '../../hooks/useGrammarCheck';
 import { useApp } from '../../contexts/AppContext';
-import { isAIConfigured } from '../../services/ai';
+import { isAIConfigured, cleanAIOutput } from '../../services/ai';
 import Toolbar from './Toolbar';
 import AIToolbar from './AIToolbar';
 import DiffSuggestion from './DiffSuggestion';
@@ -158,13 +158,19 @@ export default function Editor({ initialContent, onEditorReady, onUpdate }) {
 
   const handleAcceptAI = useCallback(() => {
     if (!editor || !aiResult) return;
-    const finalResult = aiResult.includes('---') ? aiResult.split('---')[1].trim() : aiResult;
+    const cleaned = cleanAIOutput(aiResult, 'text-only');
 
     const { from, to } = editor.state.selection;
     if (from !== to) {
-      editor.chain().focus().deleteSelection().insertContent(finalResult).run();
+      editor.chain().focus().deleteSelection().insertContent({
+        type: 'text',
+        text: cleaned,
+      }).run();
     } else {
-      editor.commands.setContent(`<p>${finalResult.replace(/\n/g, '</p><p>')}</p>`);
+      editor.chain().focus().insertContent({
+        type: 'text',
+        text: cleaned,
+      }).run();
     }
     setAiResult('');
   }, [editor, aiResult]);

@@ -17,10 +17,28 @@ export default function GrammarTooltip({ editor, errors, onFix, onDismiss }) {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [activeError, setActiveError] = useState(null);
   const tooltipRef = useRef(null);
+  const hideTimer = useRef(null);
+
+  const cancelHide = useCallback(() => {
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+      hideTimer.current = null;
+    }
+  }, []);
+
+  const scheduleHide = useCallback(() => {
+    cancelHide();
+    hideTimer.current = setTimeout(() => {
+      setVisible(false);
+      setActiveError(null);
+    }, 300);
+  }, [cancelHide]);
 
   const handleMouseOver = useCallback((e) => {
     const errorEl = e.target.closest('.grammar-error');
     if (!errorEl) return;
+
+    cancelHide();
 
     const errorId = errorEl.getAttribute('data-error-id');
     const error = errors.find(err => err.id === errorId);
@@ -31,20 +49,19 @@ export default function GrammarTooltip({ editor, errors, onFix, onDismiss }) {
     if (!editorRect) return;
 
     setPosition({
-      top: rect.bottom - editorRect.top + 4,
+      top: rect.bottom - editorRect.top + 2,
       left: rect.left - editorRect.left,
     });
     setActiveError(error);
     setVisible(true);
-  }, [editor, errors]);
+  }, [editor, errors, cancelHide]);
 
   const handleMouseOut = useCallback((e) => {
     const relatedTarget = e.relatedTarget;
     if (tooltipRef.current?.contains(relatedTarget)) return;
     if (relatedTarget?.closest('.grammar-error')) return;
-    setVisible(false);
-    setActiveError(null);
-  }, []);
+    scheduleHide();
+  }, [scheduleHide]);
 
   useEffect(() => {
     if (!editor?.view?.dom) return;
@@ -54,8 +71,9 @@ export default function GrammarTooltip({ editor, errors, onFix, onDismiss }) {
     return () => {
       dom.removeEventListener('mouseover', handleMouseOver);
       dom.removeEventListener('mouseout', handleMouseOut);
+      cancelHide();
     };
-  }, [editor, handleMouseOver, handleMouseOut]);
+  }, [editor, handleMouseOver, handleMouseOut, cancelHide]);
 
   if (!visible || !activeError) return null;
 
@@ -64,7 +82,8 @@ export default function GrammarTooltip({ editor, errors, onFix, onDismiss }) {
       ref={tooltipRef}
       className="grammar-tooltip"
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
-      onMouseLeave={() => { setVisible(false); setActiveError(null); }}
+      onMouseEnter={cancelHide}
+      onMouseLeave={scheduleHide}
     >
       <div className="grammar-tooltip__header">
         <span className={`grammar-tooltip__badge grammar-tooltip__badge--${activeError.type}`}>

@@ -14,6 +14,9 @@
   min-width: 200px;
   font-size: var(--text-xs);
   animation: fadeIn 0.15s ease;
+  /* Invisible bridge area above tooltip so mouse can travel from error text */
+  margin-top: -8px;
+  padding-top: 18px;
 }
 
 .grammar-tooltip__header {

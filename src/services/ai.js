@@ -150,22 +150,30 @@ function buildSystem(task, format = 'Return ONLY the final rewritten text. No in
 // ==================== Post-processing ====================
 
 const PREAMBLE_PATTERNS = [
-  /^(?:Here(?:'s| is)(?: the| your)?[\s\S]*?:\s*\n)/i,
-  /^(?:Sure[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
-  /^(?:I've (?:rewritten|revised|corrected|improved|summarized|expanded|shortened|paraphrased)[\s\S]*?:\s*\n)/i,
-  /^(?:(?:The|Below is the) (?:corrected|revised|rewritten|improved|summarized)[\s\S]*?:\s*\n)/i,
-  /^(?:Certainly[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
-  /^(?:Of course[,!]?\s*(?:here[\s\S]*?:\s*\n)?)/i,
+  /^(?:Here(?:'s| is)(?: the| your)?[\s\S]*?:\s*\n+)/i,
+  /^(?:Sure[,!.]?\s*(?:here[\s\S]*?:\s*\n+)?)/i,
+  /^(?:I've (?:rewritten|revised|corrected|improved|summarized|expanded|shortened|paraphrased|translated|made)[\s\S]*?:\s*\n+)/i,
+  /^(?:(?:The|Below is the|This is the) (?:corrected|revised|rewritten|improved|summarized|shortened|expanded|translated)[\s\S]*?:\s*\n+)/i,
+  /^(?:Certainly[,!.]?\s*(?:here[\s\S]*?:\s*\n+)?)/i,
+  /^(?:Of course[,!.]?\s*(?:here[\s\S]*?:\s*\n+)?)/i,
+  /^(?:Okay[,!.]?\s*(?:here[\s\S]*?:\s*\n+)?)/i,
+  /^(?:Absolutely[,!.]?\s*(?:here[\s\S]*?:\s*\n+)?)/i,
+  /^(?:\*\*(?:Corrected|Revised|Rewritten|Improved|Summarized|Translated)[^*]*\*\*\s*\n+)/i,
+  /^(?:---\s*\n+)/,
 ];
 
 export function cleanAIOutput(text, mode = 'text-only') {
   if (!text || mode === 'raw') return text || '';
   let cleaned = text.trim();
 
-  // Strip preamble lines
-  for (const pattern of PREAMBLE_PATTERNS) {
-    cleaned = cleaned.replace(pattern, '');
-  }
+  // Strip preamble lines — apply multiple passes (Gemini can stack preambles)
+  let prevLen;
+  do {
+    prevLen = cleaned.length;
+    for (const pattern of PREAMBLE_PATTERNS) {
+      cleaned = cleaned.replace(pattern, '').trim();
+    }
+  } while (cleaned.length < prevLen);
 
   if (mode === 'text-only') {
     // Strip markdown code fences wrapping the entire output
@@ -178,6 +186,8 @@ export function cleanAIOutput(text, mode = 'text-only') {
     // Strip trailing explanation after --- separator
     const sepIdx = cleaned.lastIndexOf('\n---\n');
     if (sepIdx > 0) cleaned = cleaned.substring(sepIdx + 5).trim() || cleaned.substring(0, sepIdx).trim();
+    // Strip trailing notes (common Gemini pattern: "Note: I fixed..." or "Changes made:...")
+    cleaned = cleaned.replace(/\n{2,}(?:\*\*)?(?:Note|Changes|I (?:made|changed|fixed|corrected)|Key changes|What I)[\s\S]*$/i, '');
   }
 
   return cleaned.trim();
